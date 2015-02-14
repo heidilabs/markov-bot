@@ -1,0 +1,19 @@
+{
+    "authors": [
+        {
+            "name": "Erika Heidi",
+            "homepage": "http://erikaheidi.com"
+        }
+    ],
+    "autoload" : {
+        "psr-0" : { "" : "src/" }
+    },
+
+    "require": {
+        "heidilabs/markov-php": "~0.2",
+        "ttools/ttools": "~2.1.0",
+        "symfony/console": "~2.6.0",
+        "pimple/pimple": "~3.0",
+        "symfony/yaml": "~2.6.0"
+    }
+}
