@@ -33,7 +33,7 @@ class ConnectCommand extends Command
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $output->writeln("<info>Testing Twitter configuration...</info>");
-        $twitter = $this->app->getService('twitter');
+        $twitter = $this->app->get('twitter');
         $credentials = $twitter->getCredentials();
 
         if (!isset($credentials['screen_name'])) {

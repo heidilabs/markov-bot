@@ -5,36 +5,32 @@
 
 namespace MarkovBot;
 
+use MarkovBot\Service\ConfigService;
+use MarkovBot\Service\MarkovService;
+use MarkovBot\Service\TwitterService;
 use Pimple\Container;
 use TTools\App;
 
 class MarkovBot
 {
-    /** @var ConfigContainer  */
-    private $config;
+    /** @var string  */
+    private $configFile;
 
     /** @var Container */
     private $container;
 
     public function __construct($configFile)
     {
-        $this->config = new ConfigContainer($configFile);
+        $this->configFile = $configFile;
     }
 
     public function init()
     {
         $this->container = new Container();
+        $this->container->register(new ConfigService($this->configFile));
 
-        $this->container['twitter'] = function () {
-            $ttools = new App($this->config->get('twitter'));
-
-            return $ttools;
-        };
-    }
-
-    public function get($config)
-    {
-        return $this->config->has($config) ? $this->config->get($config) : null;
+        $this->container->register(new TwitterService());
+        $this->container->register(new MarkovService());
     }
 
     public function getContainer()
@@ -42,7 +38,7 @@ class MarkovBot
         return $this->container;
     }
 
-    public function getService($service)
+    public function get($service)
     {
         return $this->container->offsetExists($service) ? $this->container[$service] : null;
     }
