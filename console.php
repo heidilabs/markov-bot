@@ -3,7 +3,7 @@
 
 require __DIR__ . '/vendor/autoload.php';
 
-use MarkovBot\Command\ConnectCommand;
+use MarkovBot\Command\TweetTestCommand;
 use MarkovBot\Command\MarkovTestCommand;
 use MarkovBot\Command\TweetMarkovCommand;
 use Symfony\Component\Console\Application;
@@ -13,7 +13,7 @@ $markovbot = new MarkovBot(__DIR__ . '/config/config.yml');
 $markovbot->init();
 
 $application = new Application();
-$application->add(new ConnectCommand($markovbot));
+$application->add(new TweetTestCommand($markovbot));
 $application->add(new MarkovTestCommand($markovbot));
 $application->add(new TweetMarkovCommand($markovbot));
 

@@ -12,9 +12,9 @@ class FileAdaptor implements AdaptorInterface
     /** @var string */
     protected $content;
 
-    public function load(array $params = [])
+    public function load($source)
     {
-        $source = explode('://', $params['source']);
+        $source = explode('://', $source);
         $path = __DIR__ . '/../../../' . $source[1];
 
         if (!is_file($path)) {
@@ -22,6 +22,8 @@ class FileAdaptor implements AdaptorInterface
         }
 
         $this->content = file_get_contents($path);
+
+        return $this;
     }
 
     /**

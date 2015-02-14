@@ -1,0 +1,2800 @@
+VIM(1)                                                                                                   General Commands Manual                                                                                                   VIM(1)
+
+
+
+NAME
+       vim - Vi IMproved, a programmers text editor
+
+SYNOPSIS
+       vim [options] [file ..]
+       vim [options] -
+       vim [options] -t tag
+       vim [options] -q [errorfile]
+
+       ex
+       view
+       gvim gview evim eview
+       rvim rview rgvim rgview
+
+DESCRIPTION
+       Vim is a text editor that is upwards compatible to Vi.  It can be used to edit all kinds of plain text.  It is especially useful for editing programs.
+
+       There  are  a lot of enhancements above Vi: multi level undo, multi windows and buffers, syntax highlighting, command line editing, filename completion, on-line help, visual selection, etc..  See ":help vi_diff.txt" for a sum‐
+       mary of the differences between Vim and Vi.
+
+       While running Vim a lot of help can be obtained from the on-line help system, with the ":help" command.  See the ON-LINE HELP section below.
+
+       Most often Vim is started to edit a single file with the command
+
+            vim file
+
+       More generally Vim is started with:
+
+            vim [options] [filelist]
+
+       If the filelist is missing, the editor will start with an empty buffer.  Otherwise exactly one out of the following four may be used to choose one or more files to be edited.
+
+       file ..     A list of filenames.  The first one will be the current file and read into the buffer.  The cursor will be positioned on the first line of the buffer.  You can get to the other files with the ":next"  command.   To
+                   edit a file that starts with a dash, precede the filelist with "--".
+
+       -           The file to edit is read from stdin.  Commands are read from stderr, which should be a tty.
+
+       -t {tag}    The  file to edit and the initial cursor position depends on a "tag", a sort of goto label.  {tag} is looked up in the tags file, the associated file becomes the current file and the associated command is executed.
+                   Mostly this is used for C programs, in which case {tag} could be a function name.  The effect is that the file containing that function becomes the current file and the cursor is positioned  on  the  start  of  the
+                   function.  See ":help tag-commands".
+
+       -q [errorfile]
+                   Start  in  quickFix  mode.   The  file [errorfile] is read and the first error is displayed.  If [errorfile] is omitted, the filename is obtained from the 'errorfile' option (defaults to "AztecC.Err" for the Amiga,
+                   "errors.err" on other systems).  Further errors can be jumped to with the ":cn" command.  See ":help quickfix".
+
+       Vim behaves differently, depending on the name of the command (the executable may still be the same file).
+
+       vim       The "normal" way, everything is default.
+
+       ex        Start in Ex mode.  Go to Normal mode with the ":vi" command.  Can also be done with the "-e" argument.
+
+       view      Start in read-only mode.  You will be protected from writing the files.  Can also be done with the "-R" argument.
+
+       gvim gview
+                 The GUI version.  Starts a new window.  Can also be done with the "-g" argument.
+
+       evim eview
+                 The GUI version in easy mode.  Starts a new window.  Can also be done with the "-y" argument.
+
+       rvim rview rgvim rgview
+                 Like the above, but with restrictions.  It will not be possible to start shell commands, or suspend Vim.  Can also be done with the "-Z" argument.
+
+OPTIONS
+       The options may be given in any order, before or after filenames.  Options without an argument can be combined after a single dash.
+
+       +[num]      For the first file the cursor will be positioned on line "num".  If "num" is missing, the cursor will be positioned on the last line.
+
+       +/{pat}     For the first file the cursor will be positioned on the first occurrence of {pat}.  See ":help search-pattern" for the available search patterns.
+
+       +{command}
+
+       -c {command}
+                   {command} will be executed after the first file has been read.  {command} is interpreted as an Ex command.  If the {command} contains spaces it must be enclosed in double quotes (this depends on the shell  that  is
+                   used).  Example: Vim "+set si" main.c
+                   Note: You can use up to 10 "+" or "-c" commands.
+
+       -S {file}   {file} will be sourced after the first file has been read.  This is equivalent to -c "source {file}".  {file} cannot start with '-'.  If {file} is omitted "Session.vim" is used (only works when -S is the last argu‐
+                   ment).
+
+       --cmd {command}
+                   Like using "-c", but the command is executed just before processing any vimrc file.  You can use up to 10 of these commands, independently from "-c" commands.
+
+       -A          If Vim has been compiled with ARABIC support for editing right-to-left oriented files and Arabic keyboard mapping, this option starts Vim in Arabic mode, i.e. 'arabic' is set.  Otherwise an error message  is  given
+                   and Vim aborts.
+
+       -b          Binary mode.  A few options will be set that makes it possible to edit a binary or executable file.
+
+       -C          Compatible.  Set the 'compatible' option.  This will make Vim behave mostly like Vi, even though a .vimrc file exists.
+
+       -d          Start in diff mode.  There should be two, three or four file name arguments.  Vim will open all the files and show differences between them.  Works like vimdiff(1).
+
+       -d {device} Open {device} for use as a terminal.  Only on the Amiga.  Example: "-d con:20/30/600/150".
+
+       -D          Debugging.  Go to debugging mode when executing the first command from a script.
+
+       -e          Start Vim in Ex mode, just like the executable was called "ex".
+
+       -E          Start Vim in improved Ex mode, just like the executable was called "exim".
+
+       -f          Foreground.   For the GUI version, Vim will not fork and detach from the shell it was started in.  On the Amiga, Vim is not restarted to open a new window.  This option should be used when Vim is executed by a pro‐
+                   gram that will wait for the edit session to finish (e.g. mail).  On the Amiga the ":sh" and ":!" commands will not work.
+
+       --nofork    Foreground.  For the GUI version, Vim will not fork and detach from the shell it was started in.
+
+       -F          If Vim has been compiled with FKMAP support for editing right-to-left oriented files and Farsi keyboard mapping, this option starts Vim in Farsi mode, i.e. 'fkmap' and 'rightleft' are set.  Otherwise an error  mes‐
+                   sage is given and Vim aborts.
+
+       -g          If Vim has been compiled with GUI support, this option enables the GUI.  If no GUI support was compiled in, an error message is given and Vim aborts.
+
+       -h          Give a bit of help about the command line arguments and options.  After this Vim exits.
+
+       -H          If Vim has been compiled with RIGHTLEFT support for editing right-to-left oriented files and Hebrew keyboard mapping, this option starts Vim in Hebrew mode, i.e. 'hkmap' and 'rightleft' are set.  Otherwise an error
+                   message is given and Vim aborts.
+
+       -i {viminfo}
+                   When using the viminfo file is enabled, this option sets the filename to use, instead of the default "~/.viminfo".  This can also be used to skip the use of the .viminfo file, by giving the name "NONE".
+
+       -L          Same as -r.
+
+       -l          Lisp mode.  Sets the 'lisp' and 'showmatch' options on.
+
+       -m          Modifying files is disabled.  Resets the 'write' option.  You can still modify the buffer, but writing a file is not possible.
+
+       -M          Modifications not allowed.  The 'modifiable' and 'write' options will be unset, so that changes are not allowed and files can not be written.  Note that these options can be set to enable making modifications.
+
+       -N          No-compatible mode.  Reset the 'compatible' option.  This will make Vim behave a bit better, but less Vi compatible, even though a .vimrc file does not exist.
+
+       -n          No swap file will be used.  Recovery after a crash will be impossible.  Handy if you want to edit a file on a very slow medium (e.g. floppy).  Can also be done with ":set uc=0".  Can be undone with ":set uc=200".
+
+       -nb         Become an editor server for NetBeans.  See the docs for details.
+
+       -o[N]       Open N windows stacked.  When N is omitted, open one window for each file.
+
+       -O[N]       Open N windows side by side.  When N is omitted, open one window for each file.
+
+       -p[N]       Open N tab pages.  When N is omitted, open one tab page for each file.
+
+       -R          Read-only mode.  The 'readonly' option will be set.  You can still edit the buffer, but will be prevented from accidently overwriting a file.  If you do want to overwrite a file, add an exclamation mark to  the  Ex
+                   command, as in ":w!".  The -R option also implies the -n option (see below).  The 'readonly' option can be reset with ":set noro".  See ":help 'readonly'".
+
+       -r          List swap files, with information about using them for recovery.
+
+       -r {file}   Recovery mode.  The swap file is used to recover a crashed editing session.  The swap file is a file with the same filename as the text file with ".swp" appended.  See ":help recovery".
+
+       -s          Silent mode.  Only when started as "Ex" or when the "-e" option was given before the "-s" option.
+
+       -s {scriptin}
+                   The  script file {scriptin} is read.  The characters in the file are interpreted as if you had typed them.  The same can be done with the command ":source! {scriptin}".  If the end of the file is reached before the
+                   editor exits, further characters are read from the keyboard.
+
+       -T {terminal}
+                   Tells Vim the name of the terminal you are using.  Only required when the automatic way doesn't work.  Should be a terminal known to Vim (builtin) or defined in the termcap or terminfo file.
+
+       -u {vimrc}  Use the commands in the file {vimrc} for initializations.  All the other initializations are skipped.  Use this to edit a special kind of files.  It can also be used to skip all initializations by giving  the  name
+                   "NONE".  See ":help initialization" within vim for more details.
+
+       -U {gvimrc} Use  the  commands in the file {gvimrc} for GUI initializations.  All the other GUI initializations are skipped.  It can also be used to skip all GUI initializations by giving the name "NONE".  See ":help gui-init"
+                   within vim for more details.
+
+       -V[N]       Verbose.  Give messages about which files are sourced and for reading and writing a viminfo file.  The optional number N is the value for 'verbose'.  Default is 10.
+
+       -v          Start Vim in Vi mode, just like the executable was called "vi".  This only has effect when the executable is called "ex".
+
+       -w {scriptout}
+                   All the characters that you type are recorded in the file {scriptout}, until you exit Vim.  This is useful if you want to create a script file to be used with "vim  -s"  or  ":source!".   If  the  {scriptout}  file
+                   exists, characters are appended.
+
+       -W {scriptout}
+                   Like -w, but an existing file is overwritten.
+
+       -x          Use encryption when writing files.  Will prompt for a crypt key.
+
+       -X          Don't connect to the X server.  Shortens startup time in a terminal, but the window title and clipboard will not be used.
+
+       -y          Start Vim in easy mode, just like the executable was called "evim" or "eview".  Makes Vim behave like a click-and-type editor.
+
+       -Z          Restricted mode.  Works like the executable starts with "r".
+
+       --          Denotes the end of the options.  Arguments after this will be handled as a file name.  This can be used to edit a filename that starts with a '-'.
+
+       --echo-wid  GTK GUI only: Echo the Window ID on stdout.
+
+       --help      Give a help message and exit, just like "-h".
+
+       --literal   Take file name arguments literally, do not expand wildcards.  This has no effect on Unix where the shell expands wildcards.
+
+       --noplugin  Skip loading plugins.  Implied by -u NONE.
+
+       --remote    Connect to a Vim server and make it edit the files given in the rest of the arguments.  If no server is found a warning is given and the files are edited in the current Vim.
+
+       --remote-expr {expr}
+                   Connect to a Vim server, evaluate {expr} in it and print the result on stdout.
+
+       --remote-send {keys}
+                   Connect to a Vim server and send {keys} to it.
+
+       --remote-silent
+                   As --remote, but without the warning when no server is found.
+
+       --remote-wait
+                   As --remote, but Vim does not exit until the files have been edited.
+
+       --remote-wait-silent
+                   As --remote-wait, but without the warning when no server is found.
+
+       --serverlist
+                   List the names of all Vim servers that can be found.
+
+       --servername {name}
+                   Use {name} as the server name.  Used for the current Vim, unless used with a --remote argument, then it's the name of the server to connect to.
+
+       --socketid {id}
+                   GTK GUI only: Use the GtkPlug mechanism to run gvim in another window.
+
+       --version   Print version information and exit.
+
+ON-LINE HELP
+       Type  ":help"  in Vim to get started.  Type ":help subject" to get help on a specific subject.  For example: ":help ZZ" to get help for the "ZZ" command.  Use <Tab> and CTRL-D to complete subjects (":help cmdline-completion").
+       Tags are present to jump from one place to another (sort of hypertext links, see ":help").  All documentation files can be viewed in this way, for example ":help syntax.txt".
+
+FILES
+       /usr/share/vim/vim74/doc/*.txt
+                      The Vim documentation files.  Use ":help doc-file-list" to get the complete list.
+
+       /usr/share/vim/vim74/doc/tags
+                      The tags file used for finding information in the documentation files.
+
+       /usr/share/vim/vim74/syntax/syntax.vim
+                      System wide syntax initializations.
+
+       /usr/share/vim/vim74/syntax/*.vim
+                      Syntax files for various languages.
+
+       /usr/share/vim/vimrc
+                      System wide Vim initializations.
+
+       ~/.vimrc       Your personal Vim initializations.
+
+       /usr/share/vim/gvimrc
+                      System wide gvim initializations.
+
+       ~/.gvimrc      Your personal gvim initializations.
+
+       /usr/share/vim/vim74/optwin.vim
+                      Script used for the ":options" command, a nice way to view and set options.
+
+       /usr/share/vim/vim74/menu.vim
+                      System wide menu initializations for gvim.
+
+       /usr/share/vim/vim74/bugreport.vim
+                      Script to generate a bug report.  See ":help bugs".
+
+       /usr/share/vim/vim74/filetype.vim
+                      Script to detect the type of a file by its name.  See ":help 'filetype'".
+
+       /usr/share/vim/vim74/scripts.vim
+                      Script to detect the type of a file by its contents.  See ":help 'filetype'".
+
+       /usr/share/vim/vim74/print/*.ps
+                      Files used for PostScript printing.
+
+       For recent info read the VIM home page:
+       <URL:http://www.vim.org/>
+
+SEE ALSO
+       vimtutor(1)
+
+AUTHOR
+       Most of Vim was made by Bram Moolenaar, with a lot of help from others.  See ":help credits" in Vim.
+       Vim is based on Stevie, worked on by: Tim Thompson, Tony Andrews and G.R. (Fred) Walter.  Although hardly any of the original code remains.
+
+BUGS
+       Probably.  See ":help todo" for a list of known problems.
+
+       Note that a number of things that may be regarded as bugs by some, are in fact caused by a too-faithful reproduction of Vi's behaviour.  And if you think other things are bugs "because Vi does it differently", you should  take
+       a closer look at the vi_diff.txt file (or type :help vi_diff.txt when in Vim).  Also have a look at the 'compatible' and 'cpoptions' options.
+
+
+
+                                                                                                               2006 Apr 11                                                                                                         VIM(1)
+SED(1)                                                                                                        User Commands                                                                                                        SED(1)
+
+
+
+NAME
+       sed - stream editor for filtering and transforming text
+
+SYNOPSIS
+       sed [OPTION]... {script-only-if-no-other-script} [input-file]...
+
+DESCRIPTION
+       Sed  is  a stream editor.  A stream editor is used to perform basic text transformations on an input stream (a file or input from a pipeline).  While in some ways similar to an editor which permits scripted edits (such as ed),
+       sed works by making only one pass over the input(s), and is consequently more efficient.  But it is sed's ability to filter text in a pipeline which particularly distinguishes it from other types of editors.
+
+       -n, --quiet, --silent
+
+              suppress automatic printing of pattern space
+
+       -e script, --expression=script
+
+              add the script to the commands to be executed
+
+       -f script-file, --file=script-file
+
+              add the contents of script-file to the commands to be executed
+
+       --follow-symlinks
+
+              follow symlinks when processing in place
+
+       -i[SUFFIX], --in-place[=SUFFIX]
+
+              edit files in place (makes backup if SUFFIX supplied)
+
+       -l N, --line-length=N
+
+              specify the desired line-wrap length for the `l' command
+
+       --posix
+
+              disable all GNU extensions.
+
+       -r, --regexp-extended
+
+              use extended regular expressions in the script.
+
+       -s, --separate
+
+              consider files as separate rather than as a single continuous long stream.
+
+       -u, --unbuffered
+
+              load minimal amounts of data from the input files and flush the output buffers more often
+
+       -z, --null-data
+
+              separate lines by NUL characters
+
+       --help
+              display this help and exit
+
+       --version
+              output version information and exit
+
+       If no -e, --expression, -f, or --file option is given, then the first non-option argument is taken as the sed script to interpret.  All remaining arguments are names of input files; if no input files are  specified,  then  the
+       standard input is read.
+
+       GNU  sed  home  page: <http://www.gnu.org/software/sed/>.  General help using GNU software: <http://www.gnu.org/gethelp/>.  E-mail bug reports to: <bug-sed@gnu.org>.  Be sure to include the word ``sed'' somewhere in the ``Sub‐
+       ject:'' field.
+
+COMMAND SYNOPSIS
+       This is just a brief synopsis of sed commands to serve as a reminder to those who already know sed; other documentation (such as the texinfo document) must be consulted for fuller descriptions.
+
+   Zero-address ``commands''
+       : label
+              Label for b and t commands.
+
+       #comment
+              The comment extends until the next newline (or the end of a -e script fragment).
+
+       }      The closing bracket of a { } block.
+
+   Zero- or One- address commands
+       =      Print the current line number.
+
+       a \
+
+       text   Append text, which has each embedded newline preceded by a backslash.
+
+       i \
+
+       text   Insert text, which has each embedded newline preceded by a backslash.
+
+       q [exit-code]
+              Immediately quit the sed script without processing any more input, except that if auto-print is not disabled the current pattern space will be printed.  The exit code argument is a GNU extension.
+
+       Q [exit-code]
+              Immediately quit the sed script without processing any more input.  This is a GNU extension.
+
+       r filename
+              Append text read from filename.
+
+       R filename
+              Append a line read from filename.  Each invocation of the command reads a line from the file.  This is a GNU extension.
+
+   Commands which accept address ranges
+       {      Begin a block of commands (end with a }).
+
+       b label
+              Branch to label; if label is omitted, branch to end of script.
+
+       c \
+
+       text   Replace the selected lines with text, which has each embedded newline preceded by a backslash.
+
+       d      Delete pattern space.  Start next cycle.
+
+       D      If pattern space contains no newline, start a normal new cycle as if the d command was issued.  Otherwise, delete text in the pattern space up to the first newline, and restart cycle with the  resultant  pattern  space,
+              without reading a new line of input.
+
+       h H    Copy/append pattern space to hold space.
+
+       g G    Copy/append hold space to pattern space.
+
+       l      List out the current line in a ``visually unambiguous'' form.
+
+       l width
+              List out the current line in a ``visually unambiguous'' form, breaking it at width characters.  This is a GNU extension.
+
+       n N    Read/append the next line of input into the pattern space.
+
+       p      Print the current pattern space.
+
+       P      Print up to the first embedded newline of the current pattern space.
+
+       s/regexp/replacement/
+              Attempt  to match regexp against the pattern space.  If successful, replace that portion matched with replacement.  The replacement may contain the special character & to refer to that portion of the pattern space which
+              matched, and the special escapes \1 through \9 to refer to the corresponding matching sub-expressions in the regexp.
+
+       t label
+              If a s/// has done a successful substitution since the last input line was read and since the last t or T command, then branch to label; if label is omitted, branch to end of script.
+
+       T label
+              If no s/// has done a successful substitution since the last input line was read and since the last t or T command, then branch to label; if label is omitted, branch to end of script.  This is a GNU extension.
+
+       w filename
+              Write the current pattern space to filename.
+
+       W filename
+              Write the first line of the current pattern space to filename.  This is a GNU extension.
+
+       x      Exchange the contents of the hold and pattern spaces.
+
+       y/source/dest/
+              Transliterate the characters in the pattern space which appear in source to the corresponding character in dest.
+
+Addresses
+       Sed commands can be given with no addresses, in which case the command will be executed for all input lines; with one address, in which case the command will only be executed for input lines which match that address;  or  with
+       two  addresses,  in which case the command will be executed for all input lines which match the inclusive range of lines starting from the first address and continuing to the second address.  Three things to note about address
+       ranges: the syntax is addr1,addr2 (i.e., the addresses are separated by a comma); the line which addr1 matched will always be accepted, even if addr2 selects an earlier line; and if addr2 is a regexp, it  will  not  be  tested
+       against the line that addr1 matched.
+
+       After the address (or address-range), and before the command, a !  may be inserted, which specifies that the command shall only be executed if the address (or address-range) does not match.
+
+       The following address types are supported:
+
+       number Match only the specified line number (which increments cumulatively across files, unless the -s option is specified on the command line).
+
+       first~step
+              Match  every  step'th  line  starting  with line first.  For example, ``sed -n 1~2p'' will print all the odd-numbered lines in the input stream, and the address 2~5 will match every fifth line, starting with the second.
+              first can be zero; in this case, sed operates as if it were equal to step.  (This is an extension.)
+
+       $      Match the last line.
+
+       /regexp/
+              Match lines matching the regular expression regexp.
+
+       \cregexpc
+              Match lines matching the regular expression regexp.  The c may be any character.
+
+       GNU sed also supports some special 2-address forms:
+
+       0,addr2
+              Start out in "matched first address" state, until addr2 is found.  This is similar to 1,addr2, except that if addr2 matches the very first line of input the 0,addr2 form will be at the end  of  its  range,  whereas  the
+              1,addr2 form will still be at the beginning of its range.  This works only when addr2 is a regular expression.
+
+       addr1,+N
+              Will match addr1 and the N lines following addr1.
+
+       addr1,~N
+              Will match addr1 and the lines following addr1 until the next line whose input line number is a multiple of N.
+
+REGULAR EXPRESSIONS
+       POSIX.2 BREs should be supported, but they aren't completely because of performance problems.  The \n sequence in a regular expression matches the newline character, and similarly for \a, \t, and other sequences.
+
+BUGS
+       E-mail bug reports to bug-sed@gnu.org.  Also, please include the output of ``sed --version'' in the body of your report if at all possible.
+
+AUTHOR
+       Written  by  Jay  Fenlason,  Tom  Lord,  Ken  Pizzini,  and  Paolo Bonzini.  GNU sed home page: <http://www.gnu.org/software/sed/>.  General help using GNU software: <http://www.gnu.org/gethelp/>.  E-mail bug reports to: <bug-
+       sed@gnu.org>.  Be sure to include the word ``sed'' somewhere in the ``Subject:'' field.
+
+COPYRIGHT
+       Copyright © 2012 Free Software Foundation, Inc.  License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>.
+       This is free software: you are free to change and redistribute it.  There is NO WARRANTY, to the extent permitted by law.
+
+SEE ALSO
+       awk(1), ed(1), grep(1), tr(1), perlre(1), sed.info, any of various books on sed, the sed FAQ (http://sed.sf.net/grabbag/tutorials/sedfaq.txt), http://sed.sf.net/grabbag/.
+
+       The full documentation for sed is maintained as a Texinfo manual.  If the info and sed programs are properly installed at your site, the command
+
+              info sed
+
+       should give you access to the complete manual.
+
+
+
+sed 4.2.2                                                                                                     December 2012                                                                                                        SED(1)
+GREP(1)                                                                                                  General Commands Manual                                                                                                  GREP(1)
+
+
+
+NAME
+       grep, egrep, fgrep, rgrep - print lines matching a pattern
+
+SYNOPSIS
+       grep [OPTIONS] PATTERN [FILE...]
+       grep [OPTIONS] [-e PATTERN | -f FILE] [FILE...]
+
+DESCRIPTION
+       grep  searches  the  named  input  FILEs (or standard input if no files are named, or if a single hyphen-minus (-) is given as file name) for lines containing a match to the given PATTERN.  By default, grep prints the matching
+       lines.
+
+       In addition, three variant programs egrep, fgrep and rgrep are available.  egrep is the same as grep -E.  fgrep is the same as grep -F.  rgrep is the same as grep -r.  Direct invocation as either egrep or fgrep is  deprecated,
+       but is provided to allow historical applications that rely on them to run unmodified.
+
+OPTIONS
+   Generic Program Information
+       --help Print a usage message briefly summarizing these command-line options and the bug-reporting address, then exit.
+
+       -V, --version
+              Print the version number of grep to the standard output stream.  This version number should be included in all bug reports (see below).
+
+   Matcher Selection
+       -E, --extended-regexp
+              Interpret PATTERN as an extended regular expression (ERE, see below).  (-E is specified by POSIX.)
+
+       -F, --fixed-strings
+              Interpret PATTERN as a list of fixed strings, separated by newlines, any of which is to be matched.  (-F is specified by POSIX.)
+
+       -G, --basic-regexp
+              Interpret PATTERN as a basic regular expression (BRE, see below).  This is the default.
+
+       -P, --perl-regexp
+              Interpret PATTERN as a Perl regular expression (PCRE, see below).  This is highly experimental and grep -P may warn of unimplemented features.
+
+   Matching Control
+       -e PATTERN, --regexp=PATTERN
+              Use PATTERN as the pattern.  This can be used to specify multiple search patterns, or to protect a pattern beginning with a hyphen (-).  (-e is specified by POSIX.)
+
+       -f FILE, --file=FILE
+              Obtain patterns from FILE, one per line.  The empty file contains zero patterns, and therefore matches nothing.  (-f is specified by POSIX.)
+
+       -i, --ignore-case
+              Ignore case distinctions in both the PATTERN and the input files.  (-i is specified by POSIX.)
+
+       -v, --invert-match
+              Invert the sense of matching, to select non-matching lines.  (-v is specified by POSIX.)
+
+       -w, --word-regexp
+              Select  only  those  lines  containing matches that form whole words.  The test is that the matching substring must either be at the beginning of the line, or preceded by a non-word constituent character.  Similarly, it
+              must be either at the end of the line or followed by a non-word constituent character.  Word-constituent characters are letters, digits, and the underscore.
+
+       -x, --line-regexp
+              Select only those matches that exactly match the whole line.  (-x is specified by POSIX.)
+
+       -y     Obsolete synonym for -i.
+
+   General Output Control
+       -c, --count
+              Suppress normal output; instead print a count of matching lines for each input file.  With the -v, --invert-match option (see below), count non-matching lines.  (-c is specified by POSIX.)
+
+       --color[=WHEN], --colour[=WHEN]
+              Surround the matched (non-empty) strings, matching lines, context lines, file names, line numbers, byte offsets, and separators (for fields and groups of context lines) with escape sequences to display them in color  on
+              the terminal.  The colors are defined by the environment variable GREP_COLORS.  The deprecated environment variable GREP_COLOR is still supported, but its setting does not have priority.  WHEN is never, always, or auto.
+
+       -L, --files-without-match
+              Suppress normal output; instead print the name of each input file from which no output would normally have been printed.  The scanning will stop on the first match.
+
+       -l, --files-with-matches
+              Suppress normal output; instead print the name of each input file from which output would normally have been printed.  The scanning will stop on the first match.  (-l is specified by POSIX.)
+
+       -m NUM, --max-count=NUM
+              Stop  reading  a  file after NUM matching lines.  If the input is standard input from a regular file, and NUM matching lines are output, grep ensures that the standard input is positioned to just after the last matching
+              line before exiting, regardless of the presence of trailing context lines.  This enables a calling process to resume a search.  When grep stops after NUM matching lines, it outputs any trailing context lines.  When  the
+              -c or --count option is also used, grep does not output a count greater than NUM.  When the -v or --invert-match option is also used, grep stops after outputting NUM non-matching lines.
+
+       -o, --only-matching
+              Print only the matched (non-empty) parts of a matching line, with each such part on a separate output line.
+
+       -q, --quiet, --silent
+              Quiet; do not write anything to standard output.  Exit immediately with zero status if any match is found, even if an error was detected.  Also see the -s or --no-messages option.  (-q is specified by POSIX.)
+
+       -s, --no-messages
+              Suppress  error  messages  about  nonexistent  or  unreadable  files.  Portability note: unlike GNU grep, 7th Edition Unix grep did not conform to POSIX, because it lacked -q and its -s option behaved like GNU grep's -q
+              option.  USG-style grep also lacked -q but its -s option behaved like GNU grep.  Portable shell scripts should avoid both -q and -s and should redirect standard and error output to /dev/null instead.  (-s  is  specified
+              by POSIX.)
+
+   Output Line Prefix Control
+       -b, --byte-offset
+              Print the 0-based byte offset within the input file before each line of output.  If -o (--only-matching) is specified, print the offset of the matching part itself.
+
+       -H, --with-filename
+              Print the file name for each match.  This is the default when there is more than one file to search.
+
+       -h, --no-filename
+              Suppress the prefixing of file names on output.  This is the default when there is only one file (or only standard input) to search.
+
+       --label=LABEL
+              Display  input  actually coming from standard input as input coming from file LABEL.  This is especially useful when implementing tools like zgrep, e.g., gzip -cd foo.gz | grep --label=foo -H something.  See also the -H
+              option.
+
+       -n, --line-number
+              Prefix each line of output with the 1-based line number within its input file.  (-n is specified by POSIX.)
+
+       -T, --initial-tab
+              Make sure that the first character of actual line content lies on a tab stop, so that the alignment of tabs looks normal.  This is useful with options that prefix their output to the actual content: -H,-n, and  -b.   In
+              order to improve the probability that lines from a single file will all start at the same column, this also causes the line number and byte offset (if present) to be printed in a minimum size field width.
+
+       -u, --unix-byte-offsets
+              Report  Unix-style byte offsets.  This switch causes grep to report byte offsets as if the file were a Unix-style text file, i.e., with CR characters stripped off.  This will produce results identical to running grep on
+              a Unix machine.  This option has no effect unless -b option is also used; it has no effect on platforms other than MS-DOS and MS-Windows.
+
+       -Z, --null
+              Output a zero byte (the ASCII NUL character) instead of the character that normally follows a file name.  For example, grep -lZ outputs a zero byte after each file name instead of the usual newline.  This  option  makes
+              the  output unambiguous, even in the presence of file names containing unusual characters like newlines.  This option can be used with commands like find -print0, perl -0, sort -z, and xargs -0 to process arbitrary file
+              names, even those that contain newline characters.
+
+   Context Line Control
+       -A NUM, --after-context=NUM
+              Print NUM lines of trailing context after matching lines.  Places a line containing a group separator (--) between contiguous groups of matches.  With the -o or --only-matching option, this has no effect and  a  warning
+              is given.
+
+       -B NUM, --before-context=NUM
+              Print  NUM  lines of leading context before matching lines.  Places a line containing a group separator (--) between contiguous groups of matches.  With the -o or --only-matching option, this has no effect and a warning
+              is given.
+
+       -C NUM, -NUM, --context=NUM
+              Print NUM lines of output context.  Places a line containing a group separator (--) between contiguous groups of matches.  With the -o or --only-matching option, this has no effect and a warning is given.
+
+   File and Directory Selection
+       -a, --text
+              Process a binary file as if it were text; this is equivalent to the --binary-files=text option.
+
+       --binary-files=TYPE
+              If the first few bytes of a file indicate that the file contains binary data, assume that the file is of type TYPE.  By default, TYPE is binary, and grep normally outputs either a one-line message saying that  a  binary
+              file  matches,  or no message if there is no match.  If TYPE is without-match, grep assumes that a binary file does not match; this is equivalent to the -I option.  If TYPE is text, grep processes a binary file as if it
+              were text; this is equivalent to the -a option.  Warning: grep --binary-files=text might output binary garbage, which can have nasty side effects if the output is a terminal and if the terminal driver interprets some of
+              it as commands.
+
+       -D ACTION, --devices=ACTION
+              If  an  input  file  is  a  device,  FIFO or socket, use ACTION to process it.  By default, ACTION is read, which means that devices are read just as if they were ordinary files.  If ACTION is skip, devices are silently
+              skipped.
+
+       -d ACTION, --directories=ACTION
+              If an input file is a directory, use ACTION to process it.  By default, ACTION is read, i.e., read directories just as if they were ordinary files.  If ACTION is skip, silently skip directories.  If ACTION  is  recurse,
+              read all files under each directory, recursively, following symbolic links only if they are on the command line.  This is equivalent to the -r option.
+
+       --exclude=GLOB
+              Skip files whose base name matches GLOB (using wildcard matching).  A file-name glob can use *, ?, and [...]  as wildcards, and \ to quote a wildcard or backslash character literally.
+
+       --exclude-from=FILE
+              Skip files whose base name matches any of the file-name globs read from FILE (using wildcard matching as described under --exclude).
+
+       --exclude-dir=DIR
+              Exclude directories matching the pattern DIR from recursive searches.
+
+       -I     Process a binary file as if it did not contain matching data; this is equivalent to the --binary-files=without-match option.
+
+       --include=GLOB
+              Search only files whose base name matches GLOB (using wildcard matching as described under --exclude).
+
+       -r, --recursive
+              Read all files under each directory, recursively, following symbolic links only if they are on the command line.  This is equivalent to the -d recurse option.
+
+       -R, --dereference-recursive
+              Read all files under each directory, recursively.  Follow all symbolic links, unlike -r.
+
+   Other Options
+       --line-buffered
+              Use line buffering on output.  This can cause a performance penalty.
+
+       --mmap If  possible,  use  the mmap(2) system call to read input, instead of the default read(2) system call.  In some situations, --mmap yields better performance.  However, --mmap can cause undefined behavior (including core
+              dumps) if an input file shrinks while grep is operating, or if an I/O error occurs.
+
+       -U, --binary
+              Treat the file(s) as binary.  By default, under MS-DOS and MS-Windows, grep guesses the file type by looking at the contents of the first 32KB read from the file.  If grep decides the file is a text file, it strips  the
+              CR  characters  from  the  original  file  contents  (to  make regular expressions with ^ and $ work correctly).  Specifying -U overrules this guesswork, causing all files to be read and passed to the matching mechanism
+              verbatim; if the file is a text file with CR/LF pairs at the end of each line, this will cause some regular expressions to fail.  This option has no effect on platforms other than MS-DOS and MS-Windows.
+
+       -z, --null-data
+              Treat the input as a set of lines, each terminated by a zero byte (the ASCII NUL character) instead of a newline.  Like the -Z or --null option, this option can be used with commands like sort -z  to  process  arbitrary
+              file names.
+
+REGULAR EXPRESSIONS
+       A regular expression is a pattern that describes a set of strings.  Regular expressions are constructed analogously to arithmetic expressions, by using various operators to combine smaller expressions.
+
+       grep understands three different versions of regular expression syntax: “basic” (BRE), “extended” (ERE) and “perl” (PRCE). In GNU grep, there is no difference in available functionality between basic and extended syntaxes.  In
+       other implementations, basic regular expressions are less powerful.  The following description applies to extended regular expressions; differences for  basic  regular  expressions  are  summarized  afterwards.   Perl  regular
+       expressions give additional functionality, and are documented in pcresyntax(3) and pcrepattern(3), but only work if pcre is available in the system.
+
+       The  fundamental  building  blocks  are the regular expressions that match a single character.  Most characters, including all letters and digits, are regular expressions that match themselves.  Any meta-character with special
+       meaning may be quoted by preceding it with a backslash.
+
+       The period . matches any single character.
+
+   Character Classes and Bracket Expressions
+       A bracket expression is a list of characters enclosed by [ and ].  It matches any single character in that list; if the first character of the list is the caret ^ then it matches any character not in the  list.   For  example,
+       the regular expression [0123456789] matches any single digit.
+
+       Within  a  bracket  expression,  a range expression consists of two characters separated by a hyphen.  It matches any single character that sorts between the two characters, inclusive, using the locale's collating sequence and
+       character set.  For example, in the default C locale, [a-d] is equivalent to [abcd].  Many locales sort characters in dictionary order, and in these locales [a-d] is typically not equivalent to [abcd]; it might  be  equivalent
+       to [aBbCcDd], for example.  To obtain the traditional interpretation of bracket expressions, you can use the C locale by setting the LC_ALL environment variable to the value C.
+
+       Finally,  certain  named classes of characters are predefined within bracket expressions, as follows.  Their names are self explanatory, and they are [:alnum:], [:alpha:], [:cntrl:], [:digit:], [:graph:], [:lower:], [:print:],
+       [:punct:], [:space:], [:upper:], and [:xdigit:].  For example, [[:alnum:]] means the character class of numbers and letters in the current locale. In the C locale  and  ASCII  character  set  encoding,  this  is  the  same  as
+       [0-9A-Za-z].   (Note  that the brackets in these class names are part of the symbolic names, and must be included in addition to the brackets delimiting the bracket expression.)  Most meta-characters lose their special meaning
+       inside bracket expressions.  To include a literal ] place it first in the list.  Similarly, to include a literal ^ place it anywhere but first.  Finally, to include a literal - place it last.
+
+   Anchoring
+       The caret ^ and the dollar sign $ are meta-characters that respectively match the empty string at the beginning and end of a line.
+
+   The Backslash Character and Special Expressions
+       The symbols \< and \> respectively match the empty string at the beginning and end of a word.  The symbol \b matches the empty string at the edge of a word, and \B matches the empty string provided it's not at the  edge  of  a
+       word.  The symbol \w is a synonym for [_[:alnum:]] and \W is a synonym for [^_[:alnum:]].
+
+   Repetition
+       A regular expression may be followed by one of several repetition operators:
+       ?      The preceding item is optional and matched at most once.
+       *      The preceding item will be matched zero or more times.
+       +      The preceding item will be matched one or more times.
+       {n}    The preceding item is matched exactly n times.
+       {n,}   The preceding item is matched n or more times.
+       {,m}   The preceding item is matched at most m times.  This is a GNU extension.
+       {n,m}  The preceding item is matched at least n times, but not more than m times.
+
+   Concatenation
+       Two regular expressions may be concatenated; the resulting regular expression matches any string formed by concatenating two substrings that respectively match the concatenated expressions.
+
+   Alternation
+       Two regular expressions may be joined by the infix operator |; the resulting regular expression matches any string matching either alternate expression.
+
+   Precedence
+       Repetition takes precedence over concatenation, which in turn takes precedence over alternation.  A whole expression may be enclosed in parentheses to override these precedence rules and form a subexpression.
+
+   Back References and Subexpressions
+       The back-reference \n, where n is a single digit, matches the substring previously matched by the nth parenthesized subexpression of the regular expression.
+
+   Basic vs Extended Regular Expressions
+       In basic regular expressions the meta-characters ?, +, {, |, (, and ) lose their special meaning; instead use the backslashed versions \?, \+, \{, \|, \(, and \).
+
+       Traditional egrep did not support the { meta-character, and some egrep implementations support \{ instead, so portable scripts should avoid { in grep -E patterns and should use [{] to match a literal {.
+
+       GNU grep -E attempts to support traditional usage by assuming that { is not special if it would be the start of an invalid interval specification.  For example, the command grep -E '{1' searches for the two-character string {1
+       instead of reporting a syntax error in the regular expression.  POSIX allows this behavior as an extension, but portable scripts should avoid it.
+
+ENVIRONMENT VARIABLES
+       The behavior of grep is affected by the following environment variables.
+
+       The locale for category LC_foo is specified by examining the three environment variables LC_ALL, LC_foo, LANG, in that order.  The first of these variables that is set specifies the locale.  For example, if LC_ALL is not  set,
+       but  LC_MESSAGES  is  set to pt_BR, then the Brazilian Portuguese locale is used for the LC_MESSAGES category.  The C locale is used if none of these environment variables are set, if the locale catalog is not installed, or if
+       grep was not compiled with national language support (NLS).
+
+       GREP_OPTIONS
+              This variable specifies default options to be placed in front of any explicit options.   For  example,  if  GREP_OPTIONS  is  '--binary-files=without-match  --directories=skip',  grep  behaves  as  if  the  two  options
+              --binary-files=without-match  and  --directories=skip  had  been  specified  before any explicit options.  Option specifications are separated by whitespace.  A backslash escapes the next character, so it can be used to
+              specify an option containing whitespace or a backslash.
+
+       GREP_COLOR
+              This variable specifies the color used to highlight matched (non-empty) text.  It is deprecated in favor of GREP_COLORS, but still supported.  The mt, ms, and mc capabilities of GREP_COLORS have priority  over  it.   It
+              can  only specify the color used to highlight the matching non-empty text in any matching line (a selected line when the -v command-line option is omitted, or a context line when -v is specified).  The default is 01;31,
+              which means a bold red foreground text on the terminal's default background.
+
+       GREP_COLORS
+              Specifies the colors and other attributes used to highlight various parts of the output.  Its value is a colon-separated list of capabilities that defaults to ms=01;31:mc=01;31:sl=:cx=:fn=35:ln=32:bn=32:se=36  with  the
+              rv and ne boolean capabilities omitted (i.e., false).  Supported capabilities are as follows.
+
+              sl=    SGR  substring for whole selected lines (i.e., matching lines when the -v command-line option is omitted, or non-matching lines when -v is specified).  If however the boolean rv capability and the -v command-line
+                     option are both specified, it applies to context matching lines instead.  The default is empty (i.e., the terminal's default color pair).
+
+              cx=    SGR substring for whole context lines (i.e., non-matching lines when the -v command-line option is omitted, or matching lines when -v is specified).  If however the boolean rv capability and the  -v  command-line
+                     option are both specified, it applies to selected non-matching lines instead.  The default is empty (i.e., the terminal's default color pair).
+
+              rv     Boolean value that reverses (swaps) the meanings of the sl= and cx= capabilities when the -v command-line option is specified.  The default is false (i.e., the capability is omitted).
+
+              mt=01;31
+                     SGR  substring  for  matching non-empty text in any matching line (i.e., a selected line when the -v command-line option is omitted, or a context line when -v is specified).  Setting this is equivalent to setting
+                     both ms= and mc= at once to the same value.  The default is a bold red text foreground over the current line background.
+
+              ms=01;31
+                     SGR substring for matching non-empty text in a selected line.  (This is only used when the -v command-line option is omitted.)  The effect of the sl= (or cx= if rv) capability remains active when this  kicks  in.
+                     The default is a bold red text foreground over the current line background.
+
+              mc=01;31
+                     SGR  substring for matching non-empty text in a context line.  (This is only used when the -v command-line option is specified.)  The effect of the cx= (or sl= if rv) capability remains active when this kicks in.
+                     The default is a bold red text foreground over the current line background.
+
+              fn=35  SGR substring for file names prefixing any content line.  The default is a magenta text foreground over the terminal's default background.
+
+              ln=32  SGR substring for line numbers prefixing any content line.  The default is a green text foreground over the terminal's default background.
+
+              bn=32  SGR substring for byte offsets prefixing any content line.  The default is a green text foreground over the terminal's default background.
+
+              se=36  SGR substring for separators that are inserted between selected line fields (:), between context line fields, (-), and between groups of adjacent lines when nonzero context is specified (--).  The  default  is  a
+                     cyan text foreground over the terminal's default background.
+
+              ne     Boolean  value  that  prevents  clearing  to  the end of line using Erase in Line (EL) to Right (\33[K) each time a colorized item ends.  This is needed on terminals on which EL is not supported.  It is otherwise
+                     useful on terminals for which the back_color_erase (bce) boolean terminfo capability does not apply, when the chosen highlight colors do not affect the background, or when EL  is  too  slow  or  causes  too  much
+                     flicker.  The default is false (i.e., the capability is omitted).
+
+              Note that boolean capabilities have no =...  part.  They are omitted (i.e., false) by default and become true when specified.
+
+              See  the  Select  Graphic  Rendition  (SGR)  section in the documentation of the text terminal that is used for permitted values and their meaning as character attributes.  These substring values are integers in decimal
+              representation and can be concatenated with semicolons.  grep takes care of assembling the result into a complete SGR sequence (\33[...m).  Common values to concatenate include 1 for bold, 4 for underline, 5 for  blink,
+              7  for  inverse,  39  for  default  foreground  color,  30 to 37 for foreground colors, 90 to 97 for 16-color mode foreground colors, 38;5;0 to 38;5;255 for 88-color and 256-color modes foreground colors, 49 for default
+              background color, 40 to 47 for background colors, 100 to 107 for 16-color mode background colors, and 48;5;0 to 48;5;255 for 88-color and 256-color modes background colors.
+
+       LC_ALL, LC_COLLATE, LANG
+              These variables specify the locale for the LC_COLLATE category, which determines the collating sequence used to interpret range expressions like [a-z].
+
+       LC_ALL, LC_CTYPE, LANG
+              These variables specify the locale for the LC_CTYPE category, which determines the type of characters, e.g., which characters are whitespace.
+
+       LC_ALL, LC_MESSAGES, LANG
+              These variables specify the locale for the LC_MESSAGES category, which determines the language that grep uses for messages.  The default C locale uses American English messages.
+
+       POSIXLY_CORRECT
+              If set, grep behaves as POSIX requires; otherwise, grep behaves more like other GNU programs.  POSIX requires that options that follow file names must be treated as file names; by default, such options are  permuted  to
+              the  front  of  the  operand  list  and are treated as options.  Also, POSIX requires that unrecognized options be diagnosed as “illegal”, but since they are not really against the law the default is to diagnose them as
+              “invalid”.  POSIXLY_CORRECT also disables _N_GNU_nonoption_argv_flags_, described below.
+
+       _N_GNU_nonoption_argv_flags_
+              (Here N is grep's numeric process ID.)  If the ith character of this environment variable's value is 1, do not consider the ith operand of grep to be an option, even if it appears to  be  one.   A  shell  can  put  this
+              variable  in  the environment for each command it runs, specifying which operands are the results of file name wildcard expansion and therefore should not be treated as options.  This behavior is available only with the
+              GNU C library, and only when POSIXLY_CORRECT is not set.
+
+EXIT STATUS
+       The exit status is 0 if selected lines are found, and 1 if not found.  If an error occurred the exit status is 2.  (Note: POSIX error handling code should check for '2' or greater.)
+
+COPYRIGHT
+       Copyright 1998-2000, 2002, 2005-2014 Free Software Foundation, Inc.
+
+       This is free software; see the source for copying conditions.  There is NO warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+
+BUGS
+   Reporting Bugs
+       Email bug reports to <bug-grep@gnu.org>, a mailing list whose web page is <http://lists.gnu.org/mailman/listinfo/bug-grep>.  grep's Savannah bug tracker is located at <http://savannah.gnu.org/bugs/?group=grep>.
+
+   Known Bugs
+       Large repetition counts in the {n,m} construct may cause grep to use lots of memory.  In addition, certain other obscure regular expressions require exponential time and space, and may cause grep to run out of memory.
+
+       Back-references are very slow, and may require exponential time.
+
+SEE ALSO
+   Regular Manual Pages
+       awk(1), cmp(1), diff(1), find(1), gzip(1), perl(1), sed(1), sort(1), xargs(1), zgrep(1), mmap(2), read(2), pcre(3), pcresyntax(3), pcrepattern(3), terminfo(5), glob(7), regex(7).
+
+   POSIX Programmer's Manual Page
+       grep(1p).
+
+   TeXinfo Documentation
+       The full documentation for grep is maintained as a TeXinfo manual, which you can read at http://www.gnu.org/software/grep/manual/.  If the info and grep programs are properly installed at your site, the command
+
+              info grep
+
+       should give you access to the complete manual.
+
+NOTES
+       This man page is maintained only fitfully; the full documentation is often more up-to-date.
+
+       GNU's not Unix, but Unix is a beast; its plural form is Unixen.
+
+
+
+User Commands                                                                                                 GNU grep 2.16                                                                                                       GREP(1)
+FIND(1)                                                                                                  General Commands Manual                                                                                                  FIND(1)
+
+
+
+NAME
+       find - search for files in a directory hierarchy
+
+SYNOPSIS
+       find [-H] [-L] [-P] [-D debugopts] [-Olevel] [path...] [expression]
+
+DESCRIPTION
+       This  manual page documents the GNU version of find.  GNU find searches the directory tree rooted at each given file name by evaluating the given expression from left to right, according to the rules of precedence (see section
+       OPERATORS), until the outcome is known (the left hand side is false for and operations, true for or), at which point find moves on to the next file name.
+
+       If you are using find in an environment where security is important (for example if you are using it to search directories that are writable by other users), you should read the "Security Considerations" chapter of the  findu‐
+       tils documentation, which is called Finding Files and comes with findutils.   That document also includes a lot more detail and discussion than this manual page, so you may find it a more useful source of information.
+
+OPTIONS
+       The  -H,  -L  and  -P options control the treatment of symbolic links.  Command-line arguments following these are taken to be names of files or directories to be examined, up to the first argument that begins with `-', or the
+       argument `(' or `!'.  That argument and any following arguments are taken to be the expression describing what is to be searched for.  If no paths are given, the current directory is used.   If  no  expression  is  given,  the
+       expression -print is used (but you should probably consider using -print0 instead, anyway).
+
+       This manual page talks about `options' within the expression list.  These options control the behaviour of find but are specified immediately after the last path name.  The five `real' options -H, -L, -P, -D and -O must appear
+       before the first path name, if at all.  A double dash -- can also be used to signal that any remaining arguments are not options (though ensuring that all start points begin with either `./' or `/' is generally  safer  if  you
+       use wildcards in the list of start points).
+
+       -P     Never  follow  symbolic  links.   This is the default behaviour.  When find examines or prints information a file, and the file is a symbolic link, the information used shall be taken from the properties of the symbolic
+              link itself.
+
+
+       -L     Follow symbolic links.  When find examines or prints information about files, the information used shall be taken from the properties of the file to which the link points, not from the link itself (unless it is a broken
+              symbolic  link or find is unable to examine the file to which the link points).  Use of this option implies -noleaf.  If you later use the -P option, -noleaf will still be in effect.  If -L is in effect and find discov‐
+              ers a symbolic link to a subdirectory during its search, the subdirectory pointed to by the symbolic link will be searched.
+
+              When the -L option is in effect, the -type predicate will always match against the type of the file that a symbolic link points to rather than the link itself (unless the symbolic link is broken).  Using -L  causes  the
+              -lname and -ilname predicates always to return false.
+
+
+       -H     Do  not  follow  symbolic  links,  except  while processing the command line arguments.  When find examines or prints information about files, the information used shall be taken from the properties of the symbolic link
+              itself.   The only exception to this behaviour is when a file specified on the command line is a symbolic link, and the link can be resolved.  For that situation, the information used is taken  from  whatever  the  link
+              points  to (that is, the link is followed).  The information about the link itself is used as a fallback if the file pointed to by the symbolic link cannot be examined.  If -H is in effect and one of the paths specified
+              on the command line is a symbolic link to a directory, the contents of that directory will be examined (though of course -maxdepth 0 would prevent this).
+
+       If more than one of -H, -L and -P is specified, each overrides the others; the last one appearing on the command line takes effect.  Since it is the default, the -P option should be considered to be in effect unless either  -H
+       or -L is specified.
+
+       GNU  find  frequently  stats files during the processing of the command line itself, before any searching has begun.  These options also affect how those arguments are processed.  Specifically, there are a number of tests that
+       compare files listed on the command line against a file we are currently considering.  In each case, the file specified on the command line will have been examined and some of its properties will have been saved.  If the named
+       file  is  in fact a symbolic link, and the -P option is in effect (or if neither -H nor -L were specified), the information used for the comparison will be taken from the properties of the symbolic link.  Otherwise, it will be
+       taken from the properties of the file the link points to.  If find cannot follow the link (for example because it has insufficient privileges or the link points to a nonexistent file) the properties of the link itself will  be
+       used.
+
+       When  the  -H  or  -L  options  are  in effect, any symbolic links listed as the argument of -newer will be dereferenced, and the timestamp will be taken from the file to which the symbolic link points.  The same consideration
+       applies to -newerXY, -anewer and -cnewer.
+
+       The -follow option has a similar effect to -L, though it takes effect at the point where it appears (that is, if -L is not used but -follow is, any symbolic links appearing after -follow on the command line  will  be  derefer‐
+       enced, and those before it will not).
+
+
+       -D debugoptions
+              Print  diagnostic  information; this can be helpful to diagnose problems with why find is not doing what you want.  The list of debug options should be comma separated.  Compatibility of the debug options is not guaran‐
+              teed between releases of findutils.  For a complete list of valid debug options, see the output of find -D help.  Valid debug options include
+
+              help   Explain the debugging options
+
+              tree   Show the expression tree in its original and optimised form.
+
+              stat   Print messages as files are examined with the stat and lstat system calls.  The find program tries to minimise such calls.
+
+              opt    Prints diagnostic information relating to the optimisation of the expression tree; see the -O option.
+
+              rates  Prints a summary indicating how often each predicate succeeded or failed.
+
+       -Olevel
+              Enables query optimisation.   The find program reorders tests to speed up execution while preserving the overall effect; that is, predicates with side effects are not reordered relative to each other.  The optimisations
+              performed at each optimisation level are as follows.
+
+              0      Equivalent to optimisation level 1.
+
+              1      This is the default optimisation level and corresponds to the traditional behaviour.  Expressions are reordered so that tests based only on the names of files (for example -name and -regex) are performed first.
+
+              2      Any -type or -xtype tests are performed after any tests based only on the names of files, but before any tests that require information from the inode.  On many modern versions of Unix, file types are returned by
+                     readdir() and so these predicates are faster to evaluate than predicates which need to stat the file first.
+
+              3      At this optimisation level, the full cost-based query optimiser is enabled.  The order of tests is modified so that cheap (i.e. fast) tests are performed first and more expensive ones are performed later, if nec‐
+                     essary.  Within each cost band, predicates are evaluated earlier or later according to whether they are likely to succeed or not.  For -o, predicates which are likely to succeed are evaluated earlier, and for -a,
+                     predicates which are likely to fail are evaluated earlier.
+
+              The cost-based optimiser has a fixed idea of how likely any given test is to succeed.  In some cases the probability takes account of the specific nature of the test (for example, -type f is assumed to be more likely to
+              succeed  than  -type c).  The cost-based optimiser is currently being evaluated.   If it does not actually improve the performance of find, it will be removed again.  Conversely, optimisations that prove to be reliable,
+              robust and effective may be enabled at lower optimisation levels over time.  However, the default behaviour (i.e. optimisation level 1) will not be changed in the 4.3.x release series.  The findutils test suite runs all
+              the tests on find at each optimisation level and ensures that the result is the same.
+
+EXPRESSIONS
+       The  expression is made up of options (which affect overall operation rather than the processing of a specific file, and always return true), tests (which return a true or false value), and actions (which have side effects and
+       return a true or false value), all separated by operators.  -and is assumed where the operator is omitted.
+
+       If the expression contains no actions other than -prune, -print is performed on all files for which the expression is true.
+
+
+   OPTIONS
+       All options always return true.  Except for -daystart, -follow and -regextype, the options affect all tests, including tests specified before the option.  This is because the options are processed  when  the  command  line  is
+       parsed, while the tests don't do anything until files are examined.  The -daystart, -follow and -regextype options are different in this respect, and have an effect only on tests which appear later in the command line.  There‐
+       fore, for clarity, it is best to place them at the beginning of the expression.  A warning is issued if you don't do this.
+
+
+       -d     A synonym for -depth, for compatibility with FreeBSD, NetBSD, MacOS X and OpenBSD.
+
+
+       -daystart
+              Measure times (for -amin, -atime, -cmin, -ctime, -mmin, and -mtime) from the beginning of today rather than from 24 hours ago.  This option only affects tests which appear later on the command line.
+
+
+       -depth Process each directory's contents before the directory itself.  The -delete action also implies -depth.
+
+
+       -follow
+              Deprecated; use the -L option instead.  Dereference symbolic links.  Implies -noleaf.  The -follow option affects only those tests which appear after it on the command line.  Unless the -H or -L option has  been  speci‐
+              fied,  the  position  of  the  -follow option changes the behaviour of the -newer predicate; any files listed as the argument of -newer will be dereferenced if they are symbolic links.  The same consideration applies to
+              -newerXY, -anewer and -cnewer.  Similarly, the -type predicate will always match against the type of the file that a symbolic link points to rather than the link itself.  Using -follow  causes  the  -lname  and  -ilname
+              predicates always to return false.
+
+
+       -help, --help
+              Print a summary of the command-line usage of find and exit.
+
+
+       -ignore_readdir_race
+              Normally,  find  will  emit an error message when it fails to stat a file.  If you give this option and a file is deleted between the time find reads the name of the file from the directory and the time it tries to stat
+              the file, no error message will be issued.    This also applies to files or directories whose names are given on the command line.  This option takes effect at the time the command line is read,  which  means  that  you
+              cannot search one part of the filesystem with this option on and part of it with this option off (if you need to do that, you will need to issue two find commands instead, one with the option and one without it).
+
+
+       -maxdepth levels
+              Descend at most levels (a non-negative integer) levels of directories below the command line arguments.  -maxdepth 0
+               means only apply the tests and actions to the command line arguments.
+
+
+       -mindepth levels
+              Do not apply any tests or actions at levels less than levels (a non-negative integer).  -mindepth 1 means process all files except the command line arguments.
+
+
+       -mount Don't descend directories on other filesystems.  An alternate name for -xdev, for compatibility with some other versions of find.
+
+
+       -noignore_readdir_race
+              Turns off the effect of -ignore_readdir_race.
+
+
+       -noleaf
+              Do  not  optimize  by assuming that directories contain 2 fewer subdirectories than their hard link count.  This option is needed when searching filesystems that do not follow the Unix directory-link convention, such as
+              CD-ROM or MS-DOS filesystems or AFS volume mount points.  Each directory on a normal Unix filesystem has at least 2 hard links: its name and its `.'  entry.  Additionally, its subdirectories (if any) each  have  a  `..'
+              entry  linked  to that directory.  When find is examining a directory, after it has statted 2 fewer subdirectories than the directory's link count, it knows that the rest of the entries in the directory are non-directo‐
+              ries (`leaf' files in the directory tree).  If only the files' names need to be examined, there is no need to stat them; this gives a significant increase in search speed.
+
+
+       -regextype type
+              Changes the regular expression syntax understood by -regex and -iregex tests which occur later on the command line.  Currently-implemented types are emacs (this is the default), posix-awk, posix-basic,  posix-egrep  and
+              posix-extended.
+
+
+       -version, --version
+              Print the find version number and exit.
+
+
+       -warn, -nowarn
+              Turn  warning  messages on or off.  These warnings apply only to the command line usage, not to any conditions that find might encounter when it searches directories.  The default behaviour corresponds to -warn if stan‐
+              dard input is a tty, and to -nowarn otherwise.
+
+
+       -xdev  Don't descend directories on other filesystems.
+
+
+   TESTS
+       Some tests, for example -newerXY and -samefile, allow comparison between the file currently being examined and some reference file specified on the command line.  When these tests are used, the interpretation of the  reference
+       file  is  determined  by  the  options  -H,  -L and -P and any previous -follow, but the reference file is only examined once, at the time the command line is parsed.  If the reference file cannot be examined (for example, the
+       stat(2) system call fails for it), an error message is issued, and find exits with a nonzero status.
+
+       Numeric arguments can be specified as
+
+       +n     for greater than n,
+
+       -n     for less than n,
+
+       n      for exactly n.
+
+       -amin n
+              File was last accessed n minutes ago.
+
+
+       -anewer file
+              File was last accessed more recently than file was modified.  If file is a symbolic link and the -H option or the -L option is in effect, the access time of the file it points to is always used.
+
+
+       -atime n
+              File was last accessed n*24 hours ago.  When find figures out how many 24-hour periods ago the file was last accessed, any fractional part is ignored, so to match -atime +1, a file has to have been accessed at least two
+              days ago.
+
+
+       -cmin n
+              File's status was last changed n minutes ago.
+
+
+       -cnewer file
+              File's status was last changed more recently than file was modified.  If file is a symbolic link and the -H option or the -L option is in effect, the status-change time of the file it points to is always used.
+
+
+       -ctime n
+              File's status was last changed n*24 hours ago.  See the comments for -atime to understand how rounding affects the interpretation of file status change times.
+
+
+       -empty File is empty and is either a regular file or a directory.
+
+
+       -executable
+              Matches  files  which  are  executable  and directories which are searchable (in a file name resolution sense).  This takes into account access control lists and other permissions artefacts which the -perm test ignores.
+              This test makes use of the access(2) system call, and so can be fooled by NFS servers which do UID mapping (or root-squashing), since many systems implement access(2) in the client's kernel and so cannot make use of the
+              UID mapping information held on the server.  Because this test is based only on the result of the access(2) system call, there is no guarantee that a file for which this test succeeds can actually be executed.
+
+
+       -false Always false.
+
+
+       -fstype type
+              File  is  on  a  filesystem of type type.  The valid filesystem types vary among different versions of Unix; an incomplete list of filesystem types that are accepted on some version of Unix or another is: ufs, 4.2, 4.3,
+              nfs, tmp, mfs, S51K, S52K.  You can use -printf with the %F directive to see the types of your filesystems.
+
+
+       -gid n File's numeric group ID is n.
+
+
+       -group gname
+              File belongs to group gname (numeric group ID allowed).
+
+
+       -ilname pattern
+              Like -lname, but the match is case insensitive.  If the -L option or the -follow option is in effect, this test returns false unless the symbolic link is broken.
+
+
+       -iname pattern
+              Like -name, but the match is case insensitive.  For example, the patterns `fo*' and `F??' match the file names `Foo', `FOO', `foo', `fOo', etc.   In these patterns, unlike filename expansion by the shell, an initial '.'
+              can be matched by `*'.  That is, find -name *bar will match the file `.foobar'.   Please note that you should quote patterns as a matter of course, otherwise the shell will expand any wildcard characters in them.
+
+
+       -inum n
+              File has inode number n.  It is normally easier to use the -samefile test instead.
+
+
+       -ipath pattern
+              Behaves in the same way as -iwholename.  This option is deprecated, so please do not use it.
+
+
+       -iregex pattern
+              Like -regex, but the match is case insensitive.
+
+
+       -iwholename pattern
+              Like -wholename, but the match is case insensitive.
+
+
+       -links n
+              File has n links.
+
+
+       -lname pattern
+              File  is  a  symbolic link whose contents match shell pattern pattern.  The metacharacters do not treat `/' or `.' specially.  If the -L option or the -follow option is in effect, this test returns false unless the sym‐
+              bolic link is broken.
+
+
+       -mmin n
+              File's data was last modified n minutes ago.
+
+
+       -mtime n
+              File's data was last modified n*24 hours ago.  See the comments for -atime to understand how rounding affects the interpretation of file modification times.
+
+
+       -name pattern
+              Base of file name (the path with the leading directories removed) matches shell pattern pattern.  The metacharacters (`*', `?', and `[]') match a `.' at the start of the base name (this is a change  in  findutils-4.2.2;
+              see  section  STANDARDS  CONFORMANCE below).  To ignore a directory and the files under it, use -prune; see an example in the description of -path.  Braces are not recognised as being special, despite the fact that some
+              shells including Bash imbue braces with a special meaning in shell patterns.  The filename matching is performed with the use of the fnmatch(3) library function.   Don't forget to enclose the pattern in quotes in  order
+              to protect it from expansion by the shell.
+
+
+       -newer file
+              File was modified more recently than file.  If file is a symbolic link and the -H option or the -L option is in effect, the modification time of the file it points to is always used.
+
+
+       -newerXY reference
+              Compares the timestamp of the current file with reference.  The reference argument is normally the name of a file (and one of its timestamps is used for the comparison) but it may also be a string describing an absolute
+              time.  X and Y are placeholders for other letters, and these letters select which time belonging to how reference is used for the comparison.
+
+              a   The access time of the file reference
+              B   The birth time of the file reference
+              c   The inode status change time of reference
+              m   The modification time of the file reference
+              t   reference is interpreted directly as a time
+
+              Some combinations are invalid; for example, it is invalid for X to be t.  Some combinations are not implemented on all systems; for example B is not supported on all systems.  If an invalid or unsupported combination of
+              XY  is  specified, a fatal error results.  Time specifications are interpreted as for the argument to the -d option of GNU date.  If you try to use the birth time of a reference file, and the birth time cannot be deter‐
+              mined, a fatal error message results.  If you specify a test which refers to the birth time of files being examined, this test will fail for any files where the birth time is unknown.
+
+
+       -nogroup
+              No group corresponds to file's numeric group ID.
+
+
+       -nouser
+              No user corresponds to file's numeric user ID.
+
+
+       -path pattern
+              File name matches shell pattern pattern.  The metacharacters do not treat `/' or `.' specially; so, for example,
+                        find . -path "./sr*sc"
+              will print an entry for a directory called `./src/misc' (if one exists).  To ignore a whole directory tree, use -prune rather than checking every file in the tree.  For example, to skip the directory `src/emacs' and all
+              files and directories under it, and print the names of the other files found, do something like this:
+                        find . -path ./src/emacs -prune -o -print
+              Note  that  the pattern match test applies to the whole file name, starting from one of the start points named on the command line.  It would only make sense to use an absolute path name here if the relevant start point
+              is also an absolute path.  This means that this command will never match anything:
+                        find bar -path /foo/bar/myfile -print
+              The predicate -path is also supported by HP-UX find and will be in a forthcoming version of the POSIX standard.
+
+
+       -perm mode
+              File's permission bits are exactly mode (octal or symbolic).  Since an exact match is required, if you want to use this form for symbolic modes, you may have to specify a rather complex mode string.  For  example  -perm
+              g=w  will  only  match  files  which have mode 0020 (that is, ones for which group write permission is the only permission set).  It is more likely that you will want to use the `/' or `-' forms, for example -perm -g=w,
+              which matches any file with group write permission.  See the EXAMPLES section for some illustrative examples.
+
+
+       -perm -mode
+              All of the permission bits mode are set for the file.  Symbolic modes are accepted in this form, and this is usually the way in which would want to use them.  You must specify `u', `g' or `o' if you use a symbolic mode.
+              See the EXAMPLES section for some illustrative examples.
+
+
+       -perm /mode
+              Any  of  the  permission bits mode are set for the file.  Symbolic modes are accepted in this form.  You must specify `u', `g' or `o' if you use a symbolic mode.  See the EXAMPLES section for some illustrative examples.
+              If no permission bits in mode are set, this test matches any file (the idea here is to be consistent with the behaviour of -perm -000).
+
+
+       -perm +mode
+              Deprecated, old way of searching for files with any of the permission bits in mode set.  You should use -perm /mode instead. Trying to use the `+' syntax with symbolic modes will yield surprising results.  For  example,
+              `+u+x'  is a valid symbolic mode (equivalent to +u,+x, i.e. 0111) and will therefore not be evaluated as -perm +mode but instead as the exact mode specifier -perm mode and so it matches files with exact permissions 0111
+              instead of files with any execute bit set.  If you found this paragraph confusing, you're not alone - just use -perm /mode.  This form of the -perm test is deprecated because the POSIX specification requires the  inter‐
+              pretation of a leading `+' as being part of a symbolic mode, and so we switched to using `/' instead.
+
+
+       -readable
+              Matches  files  which  are readable.  This takes into account access control lists and other permissions artefacts which the -perm test ignores.  This test makes use of the access(2) system call, and so can be fooled by
+              NFS servers which do UID mapping (or root-squashing), since many systems implement access(2) in the client's kernel and so cannot make use of the UID mapping information held on the server.
+
+
+       -regex pattern
+              File name matches regular expression pattern.  This is a match on the whole path, not a search.  For example, to match a file named `./fubar3', you can use the regular expression `.*bar.' or `.*b.*3', but  not  `f.*r3'.
+              The regular expressions understood by find are by default Emacs Regular Expressions, but this can be changed with the -regextype option.
+
+
+       -samefile name
+              File refers to the same inode as name.   When -L is in effect, this can include symbolic links.
+
+
+       -size n[cwbkMG]
+              File uses n units of space.  The following suffixes can be used:
+
+              `b'    for 512-byte blocks (this is the default if no suffix is used)
+
+              `c'    for bytes
+
+              `w'    for two-byte words
+
+              `k'    for Kilobytes (units of 1024 bytes)
+
+              `M'    for Megabytes (units of 1048576 bytes)
+
+              `G'    for Gigabytes (units of 1073741824 bytes)
+
+              The  size does not count indirect blocks, but it does count blocks in sparse files that are not actually allocated.  Bear in mind that the `%k' and `%b' format specifiers of -printf handle sparse files differently.  The
+              `b' suffix always denotes 512-byte blocks and never 1 Kilobyte blocks, which is different to the behaviour of -ls.
+
+
+       -true  Always true.
+
+
+       -type c
+              File is of type c:
+
+              b      block (buffered) special
+
+              c      character (unbuffered) special
+
+              d      directory
+
+              p      named pipe (FIFO)
+
+              f      regular file
+
+              l      symbolic link; this is never true if the -L option or the -follow option is in effect, unless the symbolic link is broken.  If you want to search for symbolic links when -L is in effect, use -xtype.
+
+              s      socket
+
+              D      door (Solaris)
+
+       -uid n File's numeric user ID is n.
+
+
+       -used n
+              File was last accessed n days after its status was last changed.
+
+
+       -user uname
+              File is owned by user uname (numeric user ID allowed).
+
+
+       -wholename pattern
+              See -path.    This alternative is less portable than -path.
+
+
+       -writable
+              Matches files which are writable.  This takes into account access control lists and other permissions artefacts which the -perm test ignores.  This test makes use of the access(2) system call, and so can  be  fooled  by
+              NFS servers which do UID mapping (or root-squashing), since many systems implement access(2) in the client's kernel and so cannot make use of the UID mapping information held on the server.
+
+
+       -xtype c
+              The  same  as  -type  unless the file is a symbolic link.  For symbolic links: if the -H or -P option was specified, true if the file is a link to a file of type c; if the -L option has been given, true if c is `l'.  In
+              other words, for symbolic links, -xtype checks the type of the file that -type does not check.
+
+
+   ACTIONS
+       -delete
+              Delete files; true if removal succeeded.  If the removal failed, an error message is issued.  If -delete fails, find's exit status will be nonzero (when it eventually exits).  Use of -delete automatically turns  on  the
+              -depth option.
+
+              Warnings:  Don't  forget  that  the find command line is evaluated as an expression, so putting -delete first will make find try to delete everything below the starting points you specified.  When testing a find command
+              line that you later intend to use with -delete, you should explicitly specify -depth in order to avoid later surprises.  Because -delete implies -depth, you cannot usefully use -prune and -delete together.
+
+
+       -exec command ;
+              Execute command; true if 0 status is returned.  All following arguments to find are taken to be arguments to the command until an argument consisting of `;' is encountered.  The string `{}' is replaced  by  the  current
+              file name being processed everywhere it occurs in the arguments to the command, not just in arguments where it is alone, as in some versions of find.  Both of these constructions might need to be escaped (with a `\') or
+              quoted to protect them from expansion by the shell.  See the EXAMPLES section for examples of the use of the -exec option.  The specified command is run once for each matched file.  The command is executed in the start‐
+              ing directory.   There are unavoidable security problems surrounding use of the -exec action; you should use the -execdir option instead.
+
+
+       -exec command {} +
+              This  variant  of  the -exec action runs the specified command on the selected files, but the command line is built by appending each selected file name at the end; the total number of invocations of the command will be
+              much less than the number of matched files.  The command line is built in much the same way that xargs builds its command lines.  Only one instance of `{}' is allowed within the command.  The command is executed in  the
+              starting directory.
+
+
+       -execdir command ;
+
+       -execdir command {} +
+              Like -exec, but the specified command is run from the subdirectory containing the matched file, which is not normally the directory in which you started find.  This a much more secure method for invoking commands, as it
+              avoids race conditions during resolution of the paths to the matched files.  As with the -exec action, the `+' form of -execdir will build a command line to process more than one matched file, but any  given  invocation
+              of command will only list files that exist in the same subdirectory.  If you use this option, you must ensure that your $PATH environment variable does not reference `.'; otherwise, an attacker can run any commands they
+              like by leaving an appropriately-named file in a directory in which you will run -execdir.  The same applies to having entries in $PATH which are empty or which are not absolute directory names.
+
+
+       -fls file
+              True; like -ls but write to file like -fprint.  The output file is always created, even if the predicate is never matched.  See the UNUSUAL FILENAMES section for information about how unusual characters in filenames are
+              handled.
+
+
+       -fprint file
+              True;  print the full file name into file file.  If file does not exist when find is run, it is created; if it does exist, it is truncated.  The file names ``/dev/stdout'' and ``/dev/stderr'' are handled specially; they
+              refer to the standard output and standard error output, respectively.  The output file is always created, even if the predicate is never matched.  See the UNUSUAL FILENAMES section  for  information  about  how  unusual
+              characters in filenames are handled.
+
+
+       -fprint0 file
+              True; like -print0 but write to file like -fprint.  The output file is always created, even if the predicate is never matched.  See the UNUSUAL FILENAMES section for information about how unusual characters in filenames
+              are handled.
+
+
+       -fprintf file format
+              True; like -printf but write to file like -fprint.  The output file is always created, even if the predicate is never matched.  See the UNUSUAL FILENAMES section for information about how unusual characters in filenames
+              are handled.
+
+
+       -ls    True;  list  current file in ls -dils format on standard output.  The block counts are of 1K blocks, unless the environment variable POSIXLY_CORRECT is set, in which case 512-byte blocks are used.  See the UNUSUAL FILE‐
+              NAMES section for information about how unusual characters in filenames are handled.
+
+
+       -ok command ;
+              Like -exec but ask the user first.  If the user agrees, run the command.  Otherwise just return false.  If the command is run, its standard input is redirected from /dev/null.
+
+
+              The response to the prompt is matched against a pair of regular expressions to determine if it is an affirmative or negative response.  This regular expression is obtained from the system if the `POSIXLY_CORRECT'  envi‐
+              ronment  variable  is  set,  or  otherwise  from find's message translations.  If the system has no suitable definition, find's own definition will be used.   In either case, the interpretation of the regular expression
+              itself will be affected by the environment variables 'LC_CTYPE' (character classes) and 'LC_COLLATE' (character ranges and equivalence classes).
+
+
+
+
+       -okdir command ;
+              Like -execdir but ask the user first in the same way as for -ok.  If the user does not agree, just return false.  If the command is run, its standard input is redirected from /dev/null.
+
+
+       -print True; print the full file name on the standard output, followed by a newline.   If you are piping the output of find into another program and there is the faintest possibility that the files which you are searching  for
+              might contain a newline, then you should seriously consider using the -print0 option instead of -print.  See the UNUSUAL FILENAMES section for information about how unusual characters in filenames are handled.
+
+
+       -print0
+              True;  print the full file name on the standard output, followed by a null character (instead of the newline character that -print uses).  This allows file names that contain newlines or other types of white space to be
+              correctly interpreted by programs that process the find output.  This option corresponds to the -0 option of xargs.
+
+
+       -printf format
+              True; print format on the standard output, interpreting `\' escapes and `%' directives.  Field widths and precisions can be specified as with the `printf' C function.  Please note that many of the fields are printed  as
+              %s  rather  than %d, and this may mean that flags don't work as you might expect.  This also means that the `-' flag does work (it forces fields to be left-aligned).  Unlike -print, -printf does not add a newline at the
+              end of the string.  The escapes and directives are:
+
+              \a     Alarm bell.
+
+              \b     Backspace.
+
+              \c     Stop printing from this format immediately and flush the output.
+
+              \f     Form feed.
+
+              \n     Newline.
+
+              \r     Carriage return.
+
+              \t     Horizontal tab.
+
+              \v     Vertical tab.
+
+              \0     ASCII NUL.
+
+              \\     A literal backslash (`\').
+
+              \NNN   The character whose ASCII code is NNN (octal).
+
+              A `\' character followed by any other character is treated as an ordinary character, so they both are printed.
+
+              %%     A literal percent sign.
+
+              %a     File's last access time in the format returned by the C `ctime' function.
+
+              %Ak    File's last access time in the format specified by k, which is either `@' or a directive for the C `strftime' function.  The possible values for k are listed below; some of them might not be available on all sys‐
+                     tems, due to differences in `strftime' between systems.
+
+                     @      seconds since Jan. 1, 1970, 00:00 GMT, with fractional part.
+
+                     Time fields:
+
+                     H      hour (00..23)
+
+                     I      hour (01..12)
+
+                     k      hour ( 0..23)
+
+                     l      hour ( 1..12)
+
+                     M      minute (00..59)
+
+                     p      locale's AM or PM
+
+                     r      time, 12-hour (hh:mm:ss [AP]M)
+
+                     S      Second (00.00 .. 61.00).  There is a fractional part.
+
+                     T      time, 24-hour (hh:mm:ss)
+
+                     +      Date  and  time,  separated by `+', for example `2004-04-28+22:22:05.0'.  This is a GNU extension.  The time is given in the current timezone (which may be affected by setting the TZ environment variable).
+                            The seconds field includes a fractional part.
+
+                     X      locale's time representation (H:M:S)
+
+                     Z      time zone (e.g., EDT), or nothing if no time zone is determinable
+
+                     Date fields:
+
+                     a      locale's abbreviated weekday name (Sun..Sat)
+
+                     A      locale's full weekday name, variable length (Sunday..Saturday)
+
+                     b      locale's abbreviated month name (Jan..Dec)
+
+                     B      locale's full month name, variable length (January..December)
+
+                     c      locale's date and time (Sat Nov 04 12:02:33 EST 1989).  The format is the same as for ctime(3) and so to preserve compatibility with that format, there is no fractional part in the seconds field.
+
+                     d      day of month (01..31)
+
+                     D      date (mm/dd/yy)
+
+                     h      same as b
+
+                     j      day of year (001..366)
+
+                     m      month (01..12)
+
+                     U      week number of year with Sunday as first day of week (00..53)
+
+                     w      day of week (0..6)
+
+                     W      week number of year with Monday as first day of week (00..53)
+
+                     x      locale's date representation (mm/dd/yy)
+
+                     y      last two digits of year (00..99)
+
+                     Y      year (1970...)
+
+              %b     The amount of disk space used for this file in 512-byte blocks. Since disk space is allocated in multiples of the filesystem block size this is usually greater than %s/512, but it can also be smaller if the  file
+                     is a sparse file.
+
+              %c     File's last status change time in the format returned by the C `ctime' function.
+
+              %Ck    File's last status change time in the format specified by k, which is the same as for %A.
+
+              %d     File's depth in the directory tree; 0 means the file is a command line argument.
+
+              %D     The device number on which the file exists (the st_dev field of struct stat), in decimal.
+
+              %f     File's name with any leading directories removed (only the last element).
+
+              %F     Type of the filesystem the file is on; this value can be used for -fstype.
+
+              %g     File's group name, or numeric group ID if the group has no name.
+
+              %G     File's numeric group ID.
+
+              %h     Leading directories of file's name (all but the last element).  If the file name contains no slashes (since it is in the current directory) the %h specifier expands to ".".
+
+              %H     Command line argument under which file was found.
+
+              %i     File's inode number (in decimal).
+
+              %k     The  amount of disk space used for this file in 1K blocks. Since disk space is allocated in multiples of the filesystem block size this is usually greater than %s/1024, but it can also be smaller if the file is a
+                     sparse file.
+
+              %l     Object of symbolic link (empty string if file is not a symbolic link).
+
+              %m     File's permission bits (in octal).  This option uses the `traditional' numbers which most Unix implementations use, but if your particular implementation uses an unusual ordering of octal  permissions  bits,  you
+                     will  see a difference between the actual value of the file's mode and the output of %m.   Normally you will want to have a leading zero on this number, and to do this, you should use the # flag (as in, for exam‐
+                     ple, `%#m').
+
+              %M     File's permissions (in symbolic form, as for ls).  This directive is supported in findutils 4.2.5 and later.
+
+              %n     Number of hard links to file.
+
+              %p     File's name.
+
+              %P     File's name with the name of the command line argument under which it was found removed.
+
+              %s     File's size in bytes.
+
+              %S     File's sparseness.  This is calculated as (BLOCKSIZE*st_blocks / st_size).  The exact value you will get for an ordinary file of a certain length is system-dependent.  However, normally  sparse  files  will  have
+                     values  less than 1.0, and files which use indirect blocks may have a value which is greater than 1.0.   The value used for BLOCKSIZE is system-dependent, but is usually 512 bytes.   If the file size is zero, the
+                     value printed is undefined.  On systems which lack support for st_blocks, a file's sparseness is assumed to be 1.0.
+
+              %t     File's last modification time in the format returned by the C `ctime' function.
+
+              %Tk    File's last modification time in the format specified by k, which is the same as for %A.
+
+              %u     File's user name, or numeric user ID if the user has no name.
+
+              %U     File's numeric user ID.
+
+              %y     File's type (like in ls -l), U=unknown type (shouldn't happen)
+
+              %Y     File's type (like %y), plus follow symlinks: L=loop, N=nonexistent
+
+              A `%' character followed by any other character is discarded, but the other character is printed (don't rely on this, as further format characters may be introduced).  A `%' at the end  of  the  format  argument  causes
+              undefined behaviour since there is no following character.  In some locales, it may hide your door keys, while in others it may remove the final page from the novel you are reading.
+
+              The  %m and %d directives support the # , 0 and + flags, but the other directives do not, even if they print numbers.  Numeric directives that do not support these flags include G, U, b, D, k and n.  The `-' format flag
+              is supported and changes the alignment of a field from right-justified (which is the default) to left-justified.
+
+              See the UNUSUAL FILENAMES section for information about how unusual characters in filenames are handled.
+
+
+
+       -prune True; if the file is a directory, do not descend into it. If -depth is given, false; no effect.  Because -delete implies -depth, you cannot usefully use -prune and -delete together.
+
+
+       -quit  Exit immediately.  No child processes will be left running, but no more paths specified on the command line will be processed.  For example, find /tmp/foo /tmp/bar -print -quit will print  only  /tmp/foo.   Any  command
+              lines which have been built up with -execdir ... {} + will be invoked before find exits.   The exit status may or may not be zero, depending on whether an error has already occurred.
+
+
+   UNUSUAL FILENAMES
+       Many  of  the actions of find result in the printing of data which is under the control of other users.  This includes file names, sizes, modification times and so forth.  File names are a potential problem since they can con‐
+       tain any character except `\0' and `/'.  Unusual characters in file names can do unexpected and often undesirable things to your terminal (for example, changing the settings of your function keys on some  terminals).   Unusual
+       characters are handled differently by various actions, as described below.
+
+
+       -print0, -fprint0
+              Always print the exact filename, unchanged, even if the output is going to a terminal.
+
+
+       -ls, -fls
+              Unusual  characters  are  always  escaped.   White  space, backslash, and double quote characters are printed using C-style escaping (for example `\f', `\"').  Other unusual characters are printed using an octal escape.
+              Other printable characters (for -ls and -fls these are the characters between octal 041 and 0176) are printed as-is.
+
+
+       -printf, -fprintf
+              If the output is not going to a terminal, it is printed as-is.  Otherwise, the result depends on which directive is in use.  The directives %D, %F, %g, %G, %H, %Y, and %y expand to values which are not under control  of
+              files'  owners, and so are printed as-is.  The directives %a, %b, %c, %d, %i, %k, %m, %M, %n, %s, %t, %u and %U have values which are under the control of files' owners but which cannot be used to send arbitrary data to
+              the terminal, and so these are printed as-is.  The directives %f, %h, %l, %p and %P are quoted.  This quoting is performed in the same way as for GNU ls.  This is not the same quoting mechanism as the one used  for  -ls
+              and  -fls.   If  you are able to decide what format to use for the output of find then it is normally better to use `\0' as a terminator than to use newline, as file names can contain white space and newline characters.
+              The setting of the `LC_CTYPE' environment variable is used to determine which characters need to be quoted.
+
+
+       -print, -fprint
+              Quoting is handled in the same way as for -printf and -fprintf.  If you are using find in a script or in a situation where the matched files might have arbitrary names, you  should  consider  using  -print0  instead  of
+              -print.
+
+       The -ok and -okdir actions print the current filename as-is.  This may change in a future release.
+
+
+   OPERATORS
+       Listed in order of decreasing precedence:
+
+
+       ( expr )
+              Force precedence.  Since parentheses are special to the shell, you will normally need to quote them.  Many of the examples in this manual page use backslashes for this purpose: `\(...\)' instead of `(...)'.
+
+
+       ! expr True if expr is false.  This character will also usually need protection from interpretation by the shell.
+
+
+       -not expr
+              Same as ! expr, but not POSIX compliant.
+
+
+       expr1 expr2
+              Two expressions in a row are taken to be joined with an implied "and"; expr2 is not evaluated if expr1 is false.
+
+
+       expr1 -a expr2
+              Same as expr1 expr2.
+
+
+       expr1 -and expr2
+              Same as expr1 expr2, but not POSIX compliant.
+
+
+       expr1 -o expr2
+              Or; expr2 is not evaluated if expr1 is true.
+
+
+       expr1 -or expr2
+              Same as expr1 -o expr2, but not POSIX compliant.
+
+
+       expr1 , expr2
+              List;  both  expr1  and expr2 are always evaluated.  The value of expr1 is discarded; the value of the list is the value of expr2. The comma operator can be useful for searching for several different types of thing, but
+              traversing the filesystem hierarchy only once.  The -fprintf action can be used to list the various matched items into several different output files.
+
+
+
+STANDARDS CONFORMANCE
+       For closest compliance to the POSIX standard, you should set the POSIXLY_CORRECT environment variable.  The following options are specified in the POSIX standard (IEEE Std 1003.1, 2003 Edition):
+
+
+       -H     This option is supported.
+
+
+       -L     This option is supported.
+
+
+       -name  This option is supported, but POSIX conformance depends on the POSIX conformance of the system's fnmatch(3) library function.  As of findutils-4.2.2, shell metacharacters (`*', `?' or `[]'  for  example)  will  match  a
+              leading `.', because IEEE PASC interpretation 126 requires this.   This is a change from previous versions of findutils.
+
+
+       -type  Supported.   POSIX specifies `b', `c', `d', `l', `p', `f' and `s'.  GNU find also supports `D', representing a Door, where the OS provides these.
+
+
+       -ok    Supported.   Interpretation of the response is according to the "yes" and "no" patterns selected by setting the `LC_MESSAGES' environment variable.  When the `POSIXLY_CORRECT' environment variable is set, these patterns
+              are taken system's definition of a positive (yes) or negative (no) response. See the system's documentation for nl_langinfo(3), in particular YESEXPR and NOEXPR.    When `POSIXLY_CORRECT' is not set,  the  patterns  are
+              instead taken from find's own message catalogue.
+
+
+       -newer Supported.  If the file specified is a symbolic link, it is always dereferenced.  This is a change from previous behaviour, which used to take the relevant time from the symbolic link; see the HISTORY section below.
+
+
+       -perm  Supported.  If the POSIXLY_CORRECT environment variable is not set, some mode arguments (for example +a+x) which are not valid in POSIX are supported for backward-compatibility.
+
+
+       Other predicates
+              The predicates -atime, -ctime, -depth, -group, -links, -mtime, -nogroup, -nouser, -print, -prune, -size, -user and -xdev are all supported.
+
+
+       The POSIX standard specifies parentheses `(', `)', negation `!' and the `and' and `or' operators ( -a, -o).
+
+       All other options, predicates, expressions and so forth are extensions beyond the POSIX standard.  Many of these extensions are not unique to GNU find, however.
+
+       The POSIX standard requires that find detects loops:
+
+              The find utility shall detect infinite loops; that is, entering a previously visited directory that is an ancestor of the last file encountered. When it detects an infinite loop, find shall write a diagnostic message to
+              standard error and shall either recover its position in the hierarchy or terminate.
+
+       GNU find complies with these requirements.  The link count of directories which contain entries which are hard links to an ancestor will often be lower than they otherwise should be.  This can mean that GNU find will sometimes
+       optimise  away the visiting of a subdirectory which is actually a link to an ancestor.  Since find does not actually enter such a subdirectory, it is allowed to avoid emitting a diagnostic message.  Although this behaviour may
+       be somewhat confusing, it is unlikely that anybody actually depends on this behaviour.  If the leaf optimisation has been turned off with -noleaf, the directory entry will always be examined and the diagnostic message will  be
+       issued  where  it is appropriate.  Symbolic links cannot be used to create filesystem cycles as such, but if the -L option or the -follow option is in use, a diagnostic message is issued when find encounters a loop of symbolic
+       links.  As with loops containing hard links, the leaf optimisation will often mean that find knows that it doesn't need to call stat() or chdir() on the symbolic link, so this diagnostic is frequently not necessary.
+
+       The -d option is supported for compatibility with various BSD systems, but you should use the POSIX-compliant option -depth instead.
+
+       The POSIXLY_CORRECT environment variable does not affect the behaviour of the -regex or -iregex tests because those tests aren't specified in the POSIX standard.
+
+ENVIRONMENT VARIABLES
+       LANG   Provides a default value for the internationalization variables that are unset or null.
+
+
+       LC_ALL If set to a non-empty string value, override the values of all the other internationalization variables.
+
+
+       LC_COLLATE
+              The POSIX standard specifies that this variable affects the pattern matching to be used for the -name option.   GNU find uses the fnmatch(3) library function, and so  support  for  `LC_COLLATE'  depends  on  the  system
+              library.     This  variable  also  affects  the interpretation of the response to -ok; while the `LC_MESSAGES' variable selects the actual pattern used to interpret the response to -ok, the interpretation of any bracket
+              expressions in the pattern will be affected by `LC_COLLATE'.
+
+
+       LC_CTYPE
+              This variable affects the treatment of character classes used in regular expressions and also with the -name test, if the system's fnmatch(3) library function supports this.  This variable also affects  the  interpreta‐
+              tion  of  any character classes in the regular expressions used to interpret the response to the prompt issued by -ok.  The `LC_CTYPE' environment variable will also affect which characters are considered to be unprint‐
+              able when filenames are printed; see the section UNUSUAL FILENAMES.
+
+
+       LC_MESSAGES
+              Determines the locale to be used for internationalised messages.  If the `POSIXLY_CORRECT' environment variable is set, this also determines the interpretation of the response to the prompt made by the -ok action.
+
+
+       NLSPATH
+              Determines the location of the internationalisation message catalogues.
+
+
+       PATH   Affects the directories which are searched to find the executables invoked by -exec, -execdir, -ok and -okdir.
+
+
+       POSIXLY_CORRECT
+              Determines the block size used by -ls and -fls.  If POSIXLY_CORRECT is set, blocks are units of 512 bytes.  Otherwise they are units of 1024 bytes.
+
+              Setting this variable also turns off warning messages (that is, implies -nowarn) by default, because POSIX requires that apart from the output for -ok, all messages printed on stderr are diagnostics and must result in a
+              non-zero exit status.
+
+              When POSIXLY_CORRECT is not set, -perm +zzz is treated just like -perm /zzz if +zzz is not a valid symbolic mode.  When POSIXLY_CORRECT is set, such constructs are treated as an error.
+
+              When POSIXLY_CORRECT is set, the response to the prompt made by the -ok action is interpreted according to the system's message catalogue, as opposed to according to find's own message translations.
+
+
+       TZ     Affects the time zone used for some of the time-related format directives of -printf and -fprintf.
+
+EXAMPLES
+       find /tmp -name core -type f -print | xargs /bin/rm -f
+
+       Find files named core in or below the directory /tmp and delete them.  Note that this will work incorrectly if there are any filenames containing newlines, single or double quotes, or spaces.
+
+       find /tmp -name core -type f -print0 | xargs -0 /bin/rm -f
+
+       Find  files  named  core  in or below the directory /tmp and delete them, processing filenames in such a way that file or directory names containing single or double quotes, spaces or newlines are correctly handled.  The -name
+       test comes before the -type test in order to avoid having to call stat(2) on every file.
+
+
+       find . -type f -exec file '{}' \;
+
+       Runs `file' on every file in or below the current directory.  Notice that the braces are enclosed in single quote marks to protect them from interpretation as shell script punctuation.  The semicolon is similarly protected  by
+       the use of a backslash, though single quotes could have been used in that case also.
+
+
+       find / \
+       \( -perm -4000 -fprintf /root/suid.txt %#m %u %p\n \) , \
+       \( -size +100M -fprintf /root/big.txt %-10s %p\n \)
+
+       Traverse the filesystem just once, listing setuid files and directories into /root/suid.txt and large files into /root/big.txt.
+
+
+       find $HOME -mtime 0
+
+       Search  for  files in your home directory which have been modified in the last twenty-four hours.  This command works this way because the time since each file was last modified is divided by 24 hours and any remainder is dis‐
+       carded.  That means that to match -mtime 0, a file will have to have a modification in the past which is less than 24 hours ago.
+
+
+       find /sbin /usr/sbin -executable \! -readable -print
+
+       Search for files which are executable but not readable.
+
+
+       find . -perm 664
+
+       Search for files which have read and write permission for their owner, and group, but which other users can read but not write to.  Files which meet these criteria but have other permissions bits set (for  example  if  someone
+       can execute the file) will not be matched.
+
+
+       find . -perm -664
+
+       Search  for files which have read and write permission for their owner and group, and which other users can read, without regard to the presence of any extra permission bits (for example the executable bit).  This will match a
+       file which has mode 0777, for example.
+
+
+       find . -perm /222
+
+       Search for files which are writable by somebody (their owner, or their group, or anybody else).
+
+
+       find . -perm /220
+       find . -perm /u+w,g+w
+       find . -perm /u=w,g=w
+
+       All three of these commands do the same thing, but the first one uses the octal representation of the file mode, and the other two use the symbolic form.  These commands all search for files which are writable by either  their
+       owner or their group.  The files don't have to be writable by both the owner and group to be matched; either will do.
+
+
+       find . -perm -220
+       find . -perm -g+w,u+w
+
+       Both these commands do the same thing; search for files which are writable by both their owner and their group.
+
+
+       find . -perm -444 -perm /222 ! -perm /111
+       find . -perm -a+r -perm /a+w ! -perm /a+x
+
+       These  two  commands  both search for files that are readable for everybody ( -perm -444 or -perm -a+r), have at least one write bit set ( -perm /222 or -perm /a+w) but are not executable for anybody ( ! -perm /111 and ! -perm
+       /a+x respectively).
+
+
+       cd /source-dir
+       find . -name .snapshot -prune -o \( \! -name *~ -print0 \)|
+       cpio -pmd0 /dest-dir
+
+       This command copies the contents of /source-dir to /dest-dir, but omits files and directories named .snapshot (and anything in them).  It also omits files or directories whose name ends in ~, but not their contents.  The  con‐
+       struct  -prune  -o \( ... -print0 \) is quite common.  The idea here is that the expression before -prune matches things which are to be pruned.  However, the -prune action itself returns true, so the following -o ensures that
+       the right hand side is evaluated only for those directories which didn't get pruned (the contents of the pruned directories are not even visited, so their contents are irrelevant).  The expression on the right hand side of the
+       -o  is in parentheses only for clarity.  It emphasises that the -print0 action takes place only for things that didn't have -prune applied to them.  Because the default `and' condition between tests binds more tightly than -o,
+       this is the default anyway, but the parentheses help to show what is going on.
+
+
+       find repo/ -exec test -d {}/.svn -o -d {}/.git -o -d {}/CVS ; \
+       -print -prune
+
+       Given the following directory of projects and their associated SCM administrative directories, perform an efficient search for the projects' roots:
+
+       repo/project1/CVS
+       repo/gnu/project2/.svn
+       repo/gnu/project3/.svn
+       repo/gnu/project3/src/.svn
+       repo/project4/.git
+
+       In this example, -prune prevents unnecessary descent into directories that have already been discovered (for example we do not search project3/src because we  already  found  project3/.svn),  but  ensures  sibling  directories
+       (project2 and project3) are found.
+
+
+EXIT STATUS
+       find  exits with status 0 if all files are processed successfully, greater than 0 if errors occur.   This is deliberately a very broad description, but if the return value is non-zero, you should not rely on the correctness of
+       the results of find.
+
+
+SEE ALSO
+       locate(1), locatedb(5), updatedb(1), xargs(1), chmod(1), fnmatch(3), regex(7), stat(2), lstat(2), ls(1), printf(3), strftime(3), ctime(3), Finding Files (on-line in Info, or printed).
+
+HISTORY
+       As of findutils-4.2.2, shell metacharacters (`*', `?' or `[]' for example) used in filename patterns will match a leading `.', because IEEE POSIX interpretation 126 requires this.
+
+       The syntax -perm +MODE was deprecated in findutils-4.2.21, in favour of -perm /MODE.  As of findutils-4.3.3, -perm /000 now matches all files instead of none.
+
+       Nanosecond-resolution timestamps were implemented in findutils-4.3.3.
+
+       As of findutils-4.3.11, the -delete action sets find's exit status to a nonzero value when it fails.  However, find will not exit immediately.  Previously, find's exit status was unaffected by the failure of -delete.
+
+       Feature                Added in   Also occurs in
+       -newerXY               4.3.3      BSD
+       -D                     4.3.1
+       -O                     4.3.1
+       -readable              4.3.0
+       -writable              4.3.0
+       -executable            4.3.0
+       -regextype             4.2.24
+       -exec ... +            4.2.12     POSIX
+       -execdir               4.2.12     BSD
+       -okdir                 4.2.12
+       -samefile              4.2.11
+       -H                     4.2.5      POSIX
+       -L                     4.2.5      POSIX
+       -P                     4.2.5      BSD
+
+       -delete                4.2.3
+       -quit                  4.2.3
+       -d                     4.2.3      BSD
+       -wholename             4.2.0
+       -iwholename            4.2.0
+       -ignore_readdir_race   4.2.0
+       -fls                   4.0
+       -ilname                3.8
+       -iname                 3.8
+       -ipath                 3.8
+       -iregex                3.8
+
+NON-BUGS
+       $ find . -name *.c -print
+       find: paths must precede expression
+       Usage: find [-H] [-L] [-P] [-Olevel] [-D help|tree|search|stat|rates|opt|exec] [path...] [expression]
+
+       This happens because *.c has been expanded by the shell resulting in find actually receiving a command line like this:
+
+       find . -name bigram.c code.c frcode.c locate.c -print
+
+       That command is of course not going to work.  Instead of doing things this way, you should enclose the pattern in quotes or escape the wildcard:
+       $ find . -name \*.c -print
+
+
+BUGS
+       There are security problems inherent in the behaviour that the POSIX standard specifies for find, which therefore cannot be fixed.  For example, the -exec action is inherently insecure, and -execdir  should  be  used  instead.
+       Please see Finding Files for more information.
+
+       The environment variable LC_COLLATE has no effect on the -ok action.
+
+       The  best  way to report a bug is to use the form at http://savannah.gnu.org/bugs/?group=findutils.  The reason for this is that you will then be able to track progress in fixing the problem.   Other comments about find(1) and
+       about the findutils package in general can be sent to the bug-findutils mailing list.  To join the list, send email to bug-findutils-request@gnu.org.
+
+
+
+                                                                                                                                                                                                                                  FIND(1)
+TAIL(1)                                                                                                       User Commands                                                                                                       TAIL(1)
+
+
+
+NAME
+       tail - output the last part of files
+
+SYNOPSIS
+       tail [OPTION]... [FILE]...
+
+DESCRIPTION
+       Print the last 10 lines of each FILE to standard output.  With more than one FILE, precede each with a header giving the file name.  With no FILE, or when FILE is -, read standard input.
+
+       Mandatory arguments to long options are mandatory for short options too.
+
+       -c, --bytes=K
+              output the last K bytes; alternatively, use -c +K to output bytes starting with the Kth of each file
+
+       -f, --follow[={name|descriptor}]
+              output appended data as the file grows; -f, --follow, and --follow=descriptor are equivalent
+
+       -F     same as --follow=name --retry
+
+       -n, --lines=K
+              output the last K lines, instead of the last 10; or use -n +K to output lines starting with the Kth
+
+       --max-unchanged-stats=N
+              with  --follow=name,  reopen a FILE which has not changed size after N (default 5) iterations to see if it has been unlinked or renamed (this is the usual case of rotated log files).  With inotify, this option is rarely
+              useful.
+
+       --pid=PID
+              with -f, terminate after process ID, PID dies
+
+       -q, --quiet, --silent
+              never output headers giving file names
+
+       --retry
+              keep trying to open a file even when it is or becomes inaccessible; useful when following by name, i.e., with --follow=name
+
+       -s, --sleep-interval=N
+              with -f, sleep for approximately N seconds (default 1.0) between iterations.  With inotify and --pid=P, check process P at least once every N seconds.
+
+       -v, --verbose
+              always output headers giving file names
+
+       --help display this help and exit
+
+       --version
+              output version information and exit
+
+       If the first character of K (the number of bytes or lines) is a '+', print beginning with the Kth item from the start of each file, otherwise, print the last K items in the file.  K may have a  multiplier  suffix:  b  512,  kB
+       1000, K 1024, MB 1000*1000, M 1024*1024, GB 1000*1000*1000, G 1024*1024*1024, and so on for T, P, E, Z, Y.
+
+       With --follow (-f), tail defaults to following the file descriptor, which means that even if a tail'ed file is renamed, tail will continue to track its end.  This default behavior is not desirable when you really want to track
+       the actual name of the file, not the file descriptor (e.g., log rotation).  Use --follow=name in that case.  That causes tail to track the named file in a way that accommodates renaming, removal and creation.
+
+AUTHOR
+       Written by Paul Rubin, David MacKenzie, Ian Lance Taylor, and Jim Meyering.
+
+REPORTING BUGS
+       Report tail bugs to bug-coreutils@gnu.org
+       GNU coreutils home page: <http://www.gnu.org/software/coreutils/>
+       General help using GNU software: <http://www.gnu.org/gethelp/>
+       Report tail translation bugs to <http://translationproject.org/team/>
+
+COPYRIGHT
+       Copyright © 2013 Free Software Foundation, Inc.  License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>.
+       This is free software: you are free to change and redistribute it.  There is NO WARRANTY, to the extent permitted by law.
+
+SEE ALSO
+       The full documentation for tail is maintained as a Texinfo manual.  If the info and tail programs are properly installed at your site, the command
+
+              info coreutils 'tail invocation'
+
+       should give you access to the complete manual.
+
+
+
+GNU coreutils 8.21                                                                                             January 2015                                                                                                       TAIL(1)
+PS(1)                                                                                                         User Commands                                                                                                         PS(1)
+
+
+
+NAME
+       ps - report a snapshot of the current processes.
+
+SYNOPSIS
+       ps [options]
+
+DESCRIPTION
+       ps displays information about a selection of the active processes.  If you want a repetitive update of the selection and the displayed information, use top(1) instead.
+
+       This version of ps accepts several kinds of options:
+
+       1   UNIX options, which may be grouped and must be preceded by a dash.
+       2   BSD options, which may be grouped and must not be used with a dash.
+       3   GNU long options, which are preceded by two dashes.
+
+       Options of different types may be freely mixed, but conflicts can appear.  There are some synonymous options, which are functionally identical, due to the many standards and ps implementations that this ps is compatible with.
+
+       Note that "ps -aux" is distinct from "ps aux".  The POSIX and UNIX standards require that "ps -aux" print all processes owned by a user named "x", as well as printing all processes that would be selected by the -a option.  If
+       the user named "x" does not exist, this ps may interpret the command as "ps aux" instead and print a warning.  This behavior is intended to aid in transitioning old scripts and habits.  It is fragile, subject to change, and
+       thus should not be relied upon.
+
+       By default, ps selects all processes with the same effective user ID (euid=EUID) as the current user and associated with the same terminal as the invoker.  It displays the process ID (pid=PID), the terminal associated with the
+       process (tname=TTY), the cumulated CPU time in [DD-]hh:mm:ss format (time=TIME), and the executable name (ucmd=CMD).  Output is unsorted by default.
+
+       The use of BSD-style options will add process state (stat=STAT) to the default display and show the command args (args=COMMAND) instead of the executable name.  You can override this with the PS_FORMAT environment variable.
+       The use of BSD-style options will also change the process selection to include processes on other terminals (TTYs) that are owned by you; alternately, this may be described as setting the selection to be the set of all
+       processes filtered to exclude processes owned by other users or not on a terminal.  These effects are not considered when options are described as being "identical" below, so -M will be considered identical to Z and so on.
+
+       Except as described below, process selection options are additive.  The default selection is discarded, and then the selected processes are added to the set of processes to be displayed.  A process will thus be shown if it
+       meets any of the given selection criteria.
+
+EXAMPLES
+       To see every process on the system using standard syntax:
+          ps -e
+          ps -ef
+          ps -eF
+          ps -ely
+
+       To see every process on the system using BSD syntax:
+          ps ax
+          ps axu
+
+       To print a process tree:
+          ps -ejH
+          ps axjf
+
+       To get info about threads:
+          ps -eLf
+          ps axms
+
+       To get security info:
+          ps -eo euser,ruser,suser,fuser,f,comm,label
+          ps axZ
+          ps -eM
+
+       To see every process running as root (real & effective ID) in user format:
+          ps -U root -u root u
+
+       To see every process with a user-defined format:
+          ps -eo pid,tid,class,rtprio,ni,pri,psr,pcpu,stat,wchan:14,comm
+          ps axo stat,euid,ruid,tty,tpgid,sess,pgrp,ppid,pid,pcpu,comm
+          ps -Ao pid,tt,user,fname,tmout,f,wchan
+
+       Print only the process IDs of syslogd:
+          ps -C syslogd -o pid=
+
+       Print only the name of PID 42:
+          ps -p 42 -o comm=
+
+SIMPLE PROCESS SELECTION
+       a      Lift the BSD-style "only yourself" restriction, which is imposed upon the set of all processes when some BSD-style (without "-") options are used or when the ps personality setting is BSD-like.  The set of processes
+              selected in this manner is in addition to the set of processes selected by other means.  An alternate description is that this option causes ps to list all processes with a terminal (tty), or to list all processes when
+              used together with the x option.
+
+       -A     Select all processes.  Identical to -e.
+
+       -a     Select all processes except both session leaders (see getsid(2)) and processes not associated with a terminal.
+
+       -d     Select all processes except session leaders.
+
+       --deselect
+              Select all processes except those that fulfill the specified conditions (negates the selection).  Identical to -N.
+
+       -e     Select all processes.  Identical to -A.
+
+       g      Really all, even session leaders.  This flag is obsolete and may be discontinued in a future release.  It is normally implied by the a flag, and is only useful when operating in the sunos4 personality.
+
+       -N     Select all processes except those that fulfill the specified conditions (negates the selection).  Identical to --deselect.
+
+       T      Select all processes associated with this terminal.  Identical to the t option without any argument.
+
+       r      Restrict the selection to only running processes.
+
+       x      Lift the BSD-style "must have a tty" restriction, which is imposed upon the set of all processes when some BSD-style (without "-") options are used or when the ps personality setting is BSD-like.  The set of processes
+              selected in this manner is in addition to the set of processes selected by other means.  An alternate description is that this option causes ps to list all processes owned by you (same EUID as ps), or to list all
+              processes when used together with the a option.
+
+PROCESS SELECTION BY LIST
+       These options accept a single argument in the form of a blank-separated or comma-separated list.  They can be used multiple times.  For example: ps -p "1 2" -p 3,4
+
+       -123   Identical to --pid 123.
+
+       123    Identical to --pid 123.
+
+       -C cmdlist
+              Select by command name.  This selects the processes whose executable name is given in cmdlist.
+
+       -G grplist
+              Select by real group ID (RGID) or name.  This selects the processes whose real group name or ID is in the grplist list.  The real group ID identifies the group of the user who created the process, see getgid(2).
+
+       -g grplist
+              Select by session OR by effective group name.  Selection by session is specified by many standards, but selection by effective group is the logical behavior that several other operating systems use.  This ps will select
+              by session when the list is completely numeric (as sessionsare).  Group ID numbers will work only when some group names are also specified.  See the -s and --group options.
+
+       --Group grplist
+              Select by real group ID (RGID) or name.  Identical to -G.
+
+       --group grplist
+              Select by effective group ID (EGID) or name.  This selects the processes whose effective group name or ID is in grplist.  The effective group ID describes the group whose file access permissions are used by the process
+              (see getegid(2)).  The -g option is often an alternative to --group.
+
+       p pidlist
+              Select by process ID.  Identical to -p and --pid.
+
+       -p pidlist
+              Select by PID.  This selects the processes whose process ID numbers appear in pidlist.  Identical to p and --pid.
+
+       --pid pidlist
+              Select by process ID.  Identical to -p and p.
+
+       --ppid pidlist
+              Select by parent process ID.  This selects the processes with a parent process ID in pidlist.  That is, it selects processes that are children of those listed in pidlist.
+
+       -s sesslist
+              Select by session ID.  This selects the processes with a session ID specified in sesslist.
+
+       --sid sesslist
+              Select by session ID.  Identical to -s.
+
+       t ttylist
+              Select by tty.  Nearly identical to -t and --tty, but can also be used with an empty ttylist to indicate the terminal associated with ps.  Using the T option is considered cleaner than using t with an empty ttylist.
+
+       -t ttylist
+              Select by tty.  This selects the processes associated with the terminals given in ttylist.  Terminals (ttys, or screens for text output) can be specified in several forms: /dev/ttyS1, ttyS1, S1.  A plain "-" may be used
+              to select processes not attached to any terminal.
+
+       --tty ttylist
+              Select by terminal.  Identical to -t and t.
+
+       U userlist
+              Select by effective user ID (EUID) or name.  This selects the processes whose effective user name or ID is in userlist.  The effective user ID describes the user whose file access permissions are used by the process
+              (see geteuid(2)).  Identical to -u and --user.
+
+       -U userlist
+              Select by real user ID (RUID) or name.  It selects the processes whose real user name or ID is in the userlist list.  The real user ID identifies the user who created the process, see getuid(2).
+
+       -u userlist
+              Select by effective user ID (EUID) or name.  This selects the processes whose effective user name or ID is in userlist.
+
+              The effective user ID describes the user whose file access permissions are used by the process (see geteuid(2)).  Identical to U and --user.
+
+       --User userlist
+              Select by real user ID (RUID) or name.  Identical to -U.
+
+       --user userlist
+              Select by effective user ID (EUID) or name.  Identical to -u and U.
+
+OUTPUT FORMAT CONTROL
+       These options are used to choose the information displayed by ps.  The output may differ by personality.
+
+       -c     Show different scheduler information for the -l option.
+
+       --context
+              Display security context format (for SELinux).
+
+       -f     Do full-format listing. This option can be combined with many other UNIX-style options to add additional columns.  It also causes the command arguments to be printed.  When used with -L, the NLWP (number of threads) and
+              LWP (thread ID) columns will be added.  See the c option, the format keyword args, and the format keyword comm.
+
+       -F     Extra full format.  See the -f option, which -F implies.
+
+       --format format
+              user-defined format.  Identical to -o and o.
+
+       j      BSD job control format.
+
+       -j     Jobs format.
+
+       l      Display BSD long format.
+
+       -l     Long format.  The -y option is often useful with this.
+
+       -M     Add a column of security data.  Identical to Z (for SELinux).
+
+       O format
+              is preloaded o (overloaded).  The BSD O option can act like -O (user-defined output format with some common fields predefined) or can be used to specify sort order.  Heuristics are used to determine the behavior of this
+              option.  To ensure that the desired behavior is obtained (sorting or formatting), specify the option in some other way (e.g.  with -O or --sort).  When used as a formatting option, it is identical to -O, with the BSD
+              personality.
+
+       -O format
+              Like -o, but preloaded with some default columns.  Identical to -o pid,format,state,tname,time,command or -o pid,format,tname,time,cmd, see -o below.
+
+       o format
+              Specify user-defined format.  Identical to -o and --format.
+
+       -o format
+              User-defined format.  format is a single argument in the form of a blank-separated or comma-separated list, which offers a way to specify individual output columns.  The recognized keywords are described in the STANDARD
+              FORMAT SPECIFIERS section below.  Headers may be renamed (ps -o pid,ruser=RealUser -o comm=Command) as desired.  If all column headers are empty (ps -o pid= -o comm=) then the header line will not be output.  Column
+              width will increase as needed for wide headers; this may be used to widen up columns such as WCHAN (ps -o pid,wchan=WIDE-WCHAN-COLUMN -o comm).  Explicit width control (ps opid,wchan:42,cmd) is offered too.  The
+              behavior of ps -o pid=X,comm=Y varies with personality; output may be one column named "X,comm=Y" or two columns named "X" and "Y".  Use multiple -o options when in doubt.  Use the PS_FORMAT environment variable to
+              specify a default as desired; DefSysV and DefBSD are macros that may be used to choose the default UNIX or BSD columns.
+
+       s      Display signal format.
+
+       u      Display user-oriented format.
+
+       v      Display virtual memory format.
+
+       X      Register format.
+
+       -y     Do not show flags; show rss in place of addr.  This option can only be used with -l.
+
+       Z      Add a column of security data.  Identical to -M (for SELinux).
+
+OUTPUT MODIFIERS
+       c      Show the true command name.  This is derived from the name of the executable file, rather than from the argv value.  Command arguments and any modifications to them are thus not shown.  This option effectively turns the
+              args format keyword into the comm format keyword; it is useful with the -f format option and with the various BSD-style format options, which all normally display the command arguments.  See the -f option, the format
+              keyword args, and the format keyword comm.
+
+       --cols n
+              Set screen width.
+
+       --columns n
+              Set screen width.
+
+       --cumulative
+              Include some dead child process data (as a sum with the parent).
+
+       e      Show the environment after the command.
+
+       f      ASCII art process hierarchy (forest).
+
+       --forest
+              ASCII art process tree.
+
+       h      No header.  (or, one header per screen in the BSD personality).  The h option is problematic.  Standard BSD ps uses this option to print a header on each page of output, but older Linux ps uses this option to totally
+              disable the header.  This version of ps follows the Linux usage of not printing the header unless the BSD personality has been selected, in which case it prints a header on each page of output.  Regardless of the
+              current personality, you can use the long options --headers and --no-headers to enable printing headers each page or disable headers entirely, respectively.
+
+       -H     Show process hierarchy (forest).
+
+       --headers
+              Repeat header lines, one per page of output.
+
+       k spec Specify sorting order.  Sorting syntax is [+|-]key[,[+|-]key[,...]].  Choose a multi-letter key from the STANDARD FORMAT SPECIFIERS section.  The "+" is optional since default direction is increasing numerical or
+              lexicographic order.  Identical to --sort.
+
+                      Examples:
+                      ps jaxkuid,-ppid,+pid
+                      ps axk comm o comm,args
+                      ps kstart_time -ef
+
+       --lines n
+              Set screen height.
+
+       -n namelist
+              Set namelist file.  Identical to N.  The namelist file is needed for a proper WCHAN display, and must match the current Linux kernel exactly for correct output.  Without this option, the default search path for the
+              namelist is:
+
+                      $PS_SYSMAP
+                      $PS_SYSTEM_MAP
+                      /proc/*/wchan
+                      /boot/System.map-$(uname -r)
+                      /boot/System.map
+                      /lib/modules/$(uname -r)/System.map
+                      /usr/src/linux/System.map
+                      /System.map
+
+       n      Numeric output for WCHAN and USER (including all types of UID and GID).
+
+       N namelist
+              Specify namelist file.  Identical to -n, see -n above.
+
+       --no-headers
+              Print no header line at all.  --no-heading is an alias for this option.
+
+       O order
+              Sorting order (overloaded).  The BSD O option can act like -O (user-defined output format with some common fields predefined) or can be used to specify sort order.  Heuristics are used to determine the behavior of this
+              option.  To ensure that the desired behavior is obtained (sorting or formatting), specify the option in some other way (e.g.  with -O or --sort).
+
+              For sorting, obsolete BSD O option syntax is O[+|-]k1[,[+|-]k2[,...]].  It orders the processes listing according to the multilevel sort specified by the sequence of one-letter short keys k1,k2, ...  described in the
+              OBSOLETE SORT KEYS section below.  The "+" is currently optional, merely re-iterating the default direction on a key, but may help to distinguish an O sort from an O format.  The "-" reverses direction only on the key
+              it precedes.
+
+       --rows n
+              Set screen height.
+
+       S      Sum up some information, such as CPU usage, from dead child processes into their parent.  This is useful for examining a system where a parent process repeatedly forks off short-lived children to do work.
+
+       --sort spec
+              Specify sorting order.  Sorting syntax is [+|-]key[,[+|-]key[,...]].  Choose a multi-letter key from the STANDARD FORMAT SPECIFIERS section.  The "+" is optional since default direction is increasing numerical or
+              lexicographic order.  Identical to k.  For example: ps jax --sort=uid,-ppid,+pid
+
+       w      Wide output.  Use this option twice for unlimited width.
+
+       -w     Wide output.  Use this option twice for unlimited width.
+
+       --width n
+              Set screen width.
+
+THREAD DISPLAY
+       H      Show threads as if they were processes.
+
+       -L     Show threads, possibly with LWP and NLWP columns.
+
+       m      Show threads after processes.
+
+       -m     Show threads after processes.
+
+       -T     Show threads, possibly with SPID column.
+
+OTHER INFORMATION
+       --help section
+              Print a help message.  The section argument can be one of simple, list, output, threads, misc or all.  The argument can be shortened to one of the underlined letters as in: s|l|o|t|m|a.
+
+       --info Print debugging info.
+
+       L      List all format specifiers.
+
+       V      Print the procps-ng version.
+
+       -V     Print the procps-ng version.
+
+       --version
+              Print the procps-ng version.
+
+NOTES
+       This ps works by reading the virtual files in /proc.  This ps does not need to be setuid kmem or have any privileges to run.  Do not give this ps any special permissions.
+
+       This ps needs access to namelist data for proper WCHAN display.  For kernels prior to 2.6, the System.map file must be installed.
+
+       CPU usage is currently expressed as the percentage of time spent running during the entire lifetime of a process.  This is not ideal, and it does not conform to the standards that ps otherwise conforms to.  CPU usage is
+       unlikely to add up to exactly 100%.
+
+       The SIZE and RSS fields don't count some parts of a process including the page tables, kernel stack, struct thread_info, and struct task_struct.  This is usually at least 20 KiB of memory that is always resident.  SIZE is the
+       virtual size of the process (code+data+stack).
+
+       Processes marked <defunct> are dead processes (so-called "zombies") that remain because their parent has not destroyed them properly.  These processes will be destroyed by init(8) if the parent process exits.
+
+       If the length of the username is greater than the length of the display column, the numeric user ID is displayed instead.
+
+       Commands options such as ps -aux are not recommended as it is a confusion of two different standards.  According to the POSIX and UNIX standards, the above command asks to display all processes with a TTY (generally the
+       commands users are running) plus all processes owned by a user named "x".  If that user doesn't exist, then ps will assume you really meant "ps aux".
+
+PROCESS FLAGS
+       The sum of these values is displayed in the "F" column, which is provided by the flags output specifier:
+
+               1    forked but didn't exec
+               4    used super-user privileges
+
+PROCESS STATE CODES
+       Here are the different values that the s, stat and state output specifiers (header "STAT" or "S") will display to describe the state of a process:
+
+               D    uninterruptible sleep (usually IO)
+               R    running or runnable (on run queue)
+               S    interruptible sleep (waiting for an event to complete)
+               T    stopped, either by a job control signal or because it is being traced
+               W    paging (not valid since the 2.6.xx kernel)
+               X    dead (should never be seen)
+               Z    defunct ("zombie") process, terminated but not reaped by its parent
+
+       For BSD formats and when the stat keyword is used, additional characters may be displayed:
+
+               <    high-priority (not nice to other users)
+               N    low-priority (nice to other users)
+               L    has pages locked into memory (for real-time and custom IO)
+               s    is a session leader
+               l    is multi-threaded (using CLONE_THREAD, like NPTL pthreads do)
+               +    is in the foreground process group
+
+OBSOLETE SORT KEYS
+       These keys are used by the BSD O option (when it is used for sorting).  The GNU --sort option doesn't use these keys, but the specifiers described below in the STANDARD FORMAT SPECIFIERS section.  Note that the values used in
+       sorting are the internal values ps uses and not the "cooked" values used in some of the output format fields (e.g.  sorting on tty will sort into device number, not according to the terminal name displayed).  Pipe ps output
+       into the sort(1) command if you want to sort the cooked values.
+
+       KEY   LONG         DESCRIPTION
+       c     cmd          simple name of executable
+       C     pcpu         cpu utilization
+       f     flags        flags as in long format F field
+       g     pgrp         process group ID
+       G     tpgid        controlling tty process group ID
+       j     cutime       cumulative user time
+       J     cstime       cumulative system time
+       k     utime        user time
+       m     min_flt      number of minor page faults
+       M     maj_flt      number of major page faults
+       n     cmin_flt     cumulative minor page faults
+       N     cmaj_flt     cumulative major page faults
+       o     session      session ID
+       p     pid          process ID
+       P     ppid         parent process ID
+       r     rss          resident set size
+       R     resident     resident pages
+       s     size         memory size in kilobytes
+       S     share        amount of shared pages
+       t     tty          the device number of the controlling tty
+       T     start_time   time process was started
+       U     uid          user ID number
+       u     user         user name
+
+       v     vsize        total VM size in KiB
+       y     priority     kernel scheduling priority
+
+AIX FORMAT DESCRIPTORS
+       This ps supports AIX format descriptors, which work somewhat like the formatting codes of printf(1) and printf(3).  For example, the normal default output can be produced with this: ps -eo "%p %y %x %c".  The NORMAL codes are
+       described in the next section.
+
+       CODE   NORMAL   HEADER
+       %C     pcpu     %CPU
+       %G     group    GROUP
+       %P     ppid     PPID
+       %U     user     USER
+       %a     args     COMMAND
+       %c     comm     COMMAND
+       %g     rgroup   RGROUP
+       %n     nice     NI
+       %p     pid      PID
+       %r     pgid     PGID
+       %t     etime    ELAPSED
+       %u     ruser    RUSER
+       %x     time     TIME
+       %y     tty      TTY
+       %z     vsz      VSZ
+
+STANDARD FORMAT SPECIFIERS
+       Here are the different keywords that may be used to control the output format (e.g. with option -o) or to sort the selected processes with the GNU-style --sort option.
+
+       For example: ps -eo pid,user,args --sort user
+
+       This version of ps tries to recognize most of the keywords used in other implementations of ps.
+
+       The following user-defined format specifiers may contain spaces: args, cmd, comm, command, fname, ucmd, ucomm, lstart, bsdstart, start.
+
+       Some keywords may not be available for sorting.
+
+
+       CODE        HEADER    DESCRIPTION
+
+       %cpu        %CPU      cpu utilization of the process in "##.#" format.  Currently, it is the CPU time used divided by the time the process has been running (cputime/realtime ratio), expressed as a percentage.  It will not add
+                             up to 100% unless you are lucky.  (alias pcpu).
+
+       %mem        %MEM      ratio of the process's resident set size  to the physical memory on the machine, expressed as a percentage.  (alias pmem).
+
+       args        COMMAND   command with all its arguments as a string. Modifications to the arguments may be shown.  The output in this column may contain spaces.  A process marked <defunct> is partly dead, waiting to be fully
+                             destroyed by its parent.  Sometimes the process args will be unavailable; when this happens, ps will instead print the executable name in brackets.  (alias cmd, command).  See also the comm format
+                             keyword, the -f option, and the c option.
+                             When specified last, this column will extend to the edge of the display.  If ps can not determine display width, as when output is redirected (piped) into a file or another command, the output width is
+                             undefined (it may be 80, unlimited, determined by the TERM variable, and so on).  The COLUMNS environment variable or --cols option may be used to exactly determine the width in this case.  The w or -w
+                             option may be also be used to adjust width.
+
+       blocked     BLOCKED   mask of the blocked signals, see signal(7).  According to the width of the field, a 32 or 64-bit mask in hexadecimal format is displayed.  (alias sig_block, sigmask).
+
+       bsdstart    START     time the command started.  If the process was started less than 24 hours ago, the output format is " HH:MM", else it is " Mmm:SS" (where Mmm is the three letters of the month).  See also
+                             lstart, start, start_time, and stime.
+
+       bsdtime     TIME      accumulated cpu time, user + system.  The display format is usually "MMM:SS", but can be shifted to the right if the process used more than 999 minutes of cpu time.
+
+       c           C         processor utilization. Currently, this is the integer value of the percent usage over the lifetime of the process.  (see %cpu).
+
+       caught      CAUGHT    mask of the caught signals, see signal(7).  According to the width of the field, a 32 or 64 bits mask in hexadecimal format is displayed.  (alias sig_catch, sigcatch).
+
+       cgroup      CGROUP    display control groups to which the process belongs.
+
+
+
+
+
+
+
+
+
+       class       CLS       scheduling class of the process.  (alias policy, cls).  Field's possible values are:
+
+                                      -   not reported
+                                      TS  SCHED_OTHER
+                                      FF  SCHED_FIFO
+                                      RR  SCHED_RR
+                                      B   SCHED_BATCH
+                                      ISO SCHED_ISO
+                                      IDL SCHED_IDLE
+                                      ?   unknown value
+
+       cls         CLS       scheduling class of the process.  (alias policy, cls).  Field's possible values are:
+
+                                      -   not reported
+                                      TS  SCHED_OTHER
+                                      FF  SCHED_FIFO
+                                      RR  SCHED_RR
+                                      B   SCHED_BATCH
+                                      ISO SCHED_ISO
+                                      IDL SCHED_IDLE
+                                      ?   unknown value
+
+       cmd         CMD       see args.  (alias args, command).
+
+       comm        COMMAND   command name (only the executable name).  Modifications to the command name will not be shown.  A process marked <defunct> is partly dead, waiting to be fully destroyed by its parent.  The output in this
+                             column may contain spaces.  (alias ucmd, ucomm).  See also the args format keyword, the -f option, and the c option.
+                             When specified last, this column will extend to the edge of the display.  If ps can not determine display width, as when output is redirected (piped) into a file or another command, the output width is
+                             undefined (it may be 80, unlimited, determined by the TERM variable, and so on).  The COLUMNS environment variable or --cols option may be used to exactly determine the width in this case.  The w or -w
+                             option may be also be used to adjust width.
+
+       command     COMMAND   See args.  (alias args, command).
+
+       cp          CP        per-mill (tenths of a percent) CPU usage.  (see %cpu).
+
+       cputime     TIME      cumulative CPU time, "[DD-]hh:mm:ss" format.  (alias time).
+
+       egid        EGID      effective group ID number of the process as a decimal integer.  (alias gid).
+
+       egroup      EGROUP    effective group ID of the process.  This will be the textual group ID, if it can be obtained and the field width permits, or a decimal representation otherwise.  (alias group).
+
+       eip         EIP       instruction pointer.
+
+       esp         ESP       stack pointer.
+
+       etime       ELAPSED   elapsed time since the process was started, in the form [[DD-]hh:]mm:ss.
+
+       etimes      ELAPSED   elapsed time since the process was started, in seconds.
+
+       euid        EUID      effective user ID (alias uid).
+
+       euser       EUSER     effective user name.  This will be the textual user ID, if it can be obtained and the field width permits, or a decimal representation otherwise.  The n option can be used to force the decimal
+                             representation.  (alias uname, user).
+
+       f           F         flags associated with the process, see the PROCESS FLAGS section.  (alias flag, flags).
+
+       fgid        FGID      filesystem access group ID.  (alias fsgid).
+
+       fgroup      FGROUP    filesystem access group ID.  This will be the textual group ID, if it can be obtained and the field width permits, or a decimal representation otherwise.  (alias fsgroup).
+
+       flag        F         see f.  (alias f, flags).
+
+       flags       F         see f.  (alias f, flag).
+
+       fname       COMMAND   first 8 bytes of the base name of the process's executable file.  The output in this column may contain spaces.
+
+       fuid        FUID      filesystem access user ID.  (alias fsuid).
+
+       fuser       FUSER     filesystem access user ID.  This will be the textual user ID, if it can be obtained and the field width permits, or a decimal representation otherwise.
+
+       gid         GID       see egid.  (alias egid).
+
+
+       group       GROUP     see egroup.  (alias egroup).
+
+       ignored     IGNORED   mask of the ignored signals, see signal(7).  According to the width of the field, a 32 or 64 bits mask in hexadecimal format is displayed.  (alias sig_ignore, sigignore).
+
+       ipcns       IPCNS     Unique inode number describing the namespace the process belongs to. See namespaces(7).
+
+       label       LABEL     security label, most commonly used for SELinux context data.  This is for the Mandatory Access Control ("MAC") found on high-security systems.
+
+       lstart      STARTED   time the command started.  See also bsdstart, start, start_time, and stime.
+
+       lsession    SESSION   displays login session identifier of a process.
+
+       lwp         LWP       light weight process (thread) ID of the dispatchable entity (alias spid, tid).  See tid for additional information.
+
+       machine     MACHINE   displays machine name for processes assigned to VM or container.
+
+       maj_flt     MAJFLT    The number of major page faults that have occurred with this process.
+
+       min_flt     MINFLT    The number of minor page faults that have occurred with this process.
+
+       mntns       MNTNS     Unique inode number describing the namespace the process belongs to. See namespaces(7).
+
+       netns       NETNS     Unique inode number describing the namespace the process belongs to. See namespaces(7).
+
+       ni          NI        nice value. This ranges from 19 (nicest) to -20 (not nice to others), see nice(1).  (alias nice).
+
+       nice        NI        see ni.(alias ni).
+
+       nlwp        NLWP      number of lwps (threads) in the process.  (alias thcount).
+
+       nwchan      WCHAN     address of the kernel function where the process is sleeping (use wchan if you want the kernel function name).  Running tasks will display a dash ('-') in this column.
+
+       ouid        OWNER     displays the Unix user identifier of the owner of the session of a process.
+
+       pcpu        %CPU      see %cpu.  (alias %cpu).
+
+       pending     PENDING   mask of the pending signals. See signal(7).  Signals pending on the process are distinct from signals pending on individual threads.  Use the m option or the -m option to see both.  According to the width
+                             of the field, a 32 or 64 bits mask in hexadecimal format is displayed.  (alias sig).
+
+       pgid        PGID      process group ID or, equivalently, the process ID of the process group leader.  (alias pgrp).
+
+       pgrp        PGRP      see pgid.  (alias pgid).
+
+       pid         PID       a number representing the process ID (alias tgid).
+
+       pidns       PIDNS     Unique inode number describing the namespace the process belongs to. See namespaces(7).
+
+       pmem        %MEM      see %mem.  (alias %mem).
+
+       policy      POL       scheduling class of the process.  (alias class, cls).  Possible values are:
+
+                                      -   not reported
+                                      TS  SCHED_OTHER
+                                      FF  SCHED_FIFO
+                                      RR  SCHED_RR
+                                      B   SCHED_BATCH
+                                      ISO SCHED_ISO
+                                      IDL SCHED_IDLE
+                                      ?   unknown value
+
+       ppid        PPID      parent process ID.
+
+       pri         PRI       priority of the process.  Higher number means lower priority.
+
+       psr         PSR       processor that process is currently assigned to.
+
+       rgid        RGID      real group ID.
+
+       rgroup      RGROUP    real group name.  This will be the textual group ID, if it can be obtained and the field width permits, or a decimal representation otherwise.
+
+
+       rss         RSS       resident set size, the non-swapped physical memory that a task has used (inkiloBytes).  (alias rssize, rsz).
+
+       rssize      RSS       see rss.  (alias rss, rsz).
+
+       rsz         RSZ       see rss.  (alias rss, rssize).
+
+       rtprio      RTPRIO    realtime priority.
+
+       ruid        RUID      real user ID.
+
+       ruser       RUSER     real user ID.  This will be the textual user ID, if it can be obtained and the field width permits, or a decimal representation otherwise.
+
+       s           S         minimal state display (one character).  See section PROCESS STATE CODES for the different values.  See also stat if you want additional information displayed.  (alias state).
+
+       sched       SCH       scheduling policy of the process.  The policies SCHED_OTHER (SCHED_NORMAL), SCHED_FIFO, SCHED_RR, SCHED_BATCH, SCHED_ISO, and SCHED_IDLE are respectively displayed as 0, 1, 2, 3, 4, and 5.
+
+       seat        SEAT      displays login session identifier of a process.
+
+       sess        SESS      session ID or, equivalently, the process ID of the session leader.  (alias session, sid).
+
+       sgi_p       P         processor that the process is currently executing on.  Displays "*" if the process is not currently running or runnable.
+
+       sgid        SGID      saved group ID.  (alias svgid).
+
+       sgroup      SGROUP    saved group name.  This will be the textual group ID, if it can be obtained and the field width permits, or a decimal representation otherwise.
+
+       sid         SID       see sess.  (alias sess, session).
+
+       sig         PENDING   see pending.  (alias pending, sig_pend).
+
+       sigcatch    CAUGHT    see caught.  (alias caught, sig_catch).
+
+       sigignore   IGNORED   see ignored.  (alias ignored, sig_ignore).
+
+       sigmask     BLOCKED   see blocked.  (alias blocked, sig_block).
+
+       size        SIZE      approximate amount of swap space that would be required if the process were to dirty all writable pages and then be swapped out.  This number is very rough!
+
+       slice       SLICE     displays slice unit which a process belongs to.
+
+       spid        SPID      see lwp.  (alias lwp, tid).
+
+       stackp      STACKP    address of the bottom (start) of stack for the process.
+
+       start       STARTED   time the command started.  If the process was started less than 24 hours ago, the output format is "HH:MM:SS", else it is "  Mmm dd" (where Mmm is a three-letter month name).  See also
+                             lstart, bsdstart, start_time, and stime.
+
+       start_time  START     starting time or date of the process.  Only the year will be displayed if the process was not started the same year ps was invoked, or "MmmDD" if it was not started the same day, or "HH:MM" otherwise.
+                             See also bsdstart, start, lstart, and stime.
+
+       stat        STAT      multi-character process state.  See section PROCESS STATE CODES for the different values meaning.  See also s and state if you just want the first character displayed.
+
+       state       S         see s. (alias s).
+
+       suid        SUID      saved user ID.  (alias svuid).
+
+       supgid      SUPGID    group ids of supplementary groups, if any.  See getgroups(2).
+
+       supgrp      SUPGRP    group names of supplementary groups, if any.  See getgroups(2).
+
+       suser       SUSER     saved user name.  This will be the textual user ID, if it can be obtained and the field width permits, or a decimal representation otherwise.  (alias svuser).
+
+       svgid       SVGID     see sgid.  (alias sgid).
+
+       svuid       SVUID     see suid.  (alias suid).
+
+       sz          SZ        size in physical pages of the core image of the process.  This includes text, data, and stack space.  Device mappings are currently excluded; this is subject to change.  See vsz and rss.
+
+       tgid        TGID      a number representing the thread group to which a task belongs (alias pid).  It is the process ID of the thread group leader.
+
+
+       thcount     THCNT     see nlwp.  (alias nlwp).  number of kernel threads owned by the process.
+
+       tid         TID       the unique number representing a dispatacable entity (alias lwp, spid).  This value may also appear as: a process ID (pid); a process group ID (pgrp); a session ID for the session leader (sid); a thread
+                             group ID for the thread group leader (tgid); and a tty process group ID for the process group leader (tpgid).
+
+       time        TIME      cumulative CPU time, "[DD-]HH:MM:SS" format.  (alias cputime).
+
+       tname       TTY       controlling tty (terminal).  (alias tt, tty).
+
+       tpgid       TPGID     ID of the foreground process group on the tty (terminal) that the process is connected to, or -1 if the process is not connected to a tty.
+
+       tt          TT        controlling tty (terminal).  (alias tname, tty).
+
+       tty         TT        controlling tty (terminal).  (alias tname, tt).
+
+       ucmd        CMD       see comm.  (alias comm, ucomm).
+
+       ucomm       COMMAND   see comm.  (alias comm, ucmd).
+
+       uid         UID       see euid.  (alias euid).
+
+       uname       USER      see euser.  (alias euser, user).
+
+       unit        UNIT      displays systemd unit which a process belongs to.
+
+       user        USER      see euser.  (alias euser, uname).
+
+       userns      USERNS    Unique inode number describing the namespace the process belongs to. See namespaces(7).
+
+       utsns       UTSNS     Unique inode number describing the namespace the process belongs to. See namespaces(7).
+
+       uunit       UUNIT     displays systemd user unit which a process belongs to.
+
+       vsize       VSZ       see vsz.  (alias vsz).
+
+       vsz         VSZ       virtual memory size of the process in KiB (1024-byte units).  Device mappings are currently excluded; this is subject to change.  (alias vsize).
+
+       wchan       WCHAN     name of the kernel function in which the process is sleeping, a "-" if the process is running, or a "*" if the process is multi-threaded and ps is not displaying threads.
+
+
+ENVIRONMENT VARIABLES
+       The following environment variables could affect ps:
+
+       COLUMNS
+          Override default display width.
+
+       LINES
+          Override default display height.
+
+       PS_PERSONALITY
+          Set to one of posix, old, linux, bsd, sun, digital...  (see section PERSONALITY below).
+
+       CMD_ENV
+          Set to one of posix, old, linux, bsd, sun, digital...  (see section PERSONALITY below).
+
+       I_WANT_A_BROKEN_PS
+          Force obsolete command line interpretation.
+
+       LC_TIME
+          Date format.
+
+       PS_COLORS
+          Not currently supported.
+
+       PS_FORMAT
+          Default output format override. You may set this to a format string of the type used for the -o option.  The DefSysV and DefBSD values are particularly useful.
+
+       PS_SYSMAP
+          Default namelist (System.map) location.
+
+       PS_SYSTEM_MAP
+          Default namelist (System.map) location.
+
+       POSIXLY_CORRECT
+          Don't find excuses to ignore bad "features".
+
+       POSIX2
+          When set to "on", acts as POSIXLY_CORRECT.
+
+       UNIX95
+          Don't find excuses to ignore bad "features".
+
+       _XPG
+          Cancel CMD_ENV=irix non-standard behavior.
+
+       In general, it is a bad idea to set these variables.  The one exception is CMD_ENV or PS_PERSONALITY, which could be set to Linux for normal systems.  Without that setting, ps follows the useless and bad parts of the Unix98
+       standard.
+
+PERSONALITY
+       390        like the OS/390 OpenEdition ps
+       aix        like AIX ps
+       bsd        like FreeBSD ps (totally non-standard)
+       compaq     like Digital Unix ps
+       debian     like the old Debian ps
+       digital    like Tru64 (was Digital Unix, was OSF/1) ps
+       gnu        like the old Debian ps
+       hp         like HP-UX ps
+       hpux       like HP-UX ps
+       irix       like Irix ps
+       linux      ***** recommended *****
+       old        like the original Linux ps (totally non-standard)
+       os390      like OS/390 Open Edition ps
+       posix      standard
+       s390       like OS/390 Open Edition ps
+       sco        like SCO ps
+       sgi        like Irix ps
+       solaris2   like Solaris 2+ (SunOS 5) ps
+       sunos4     like SunOS 4 (Solaris 1) ps (totally non-standard)
+       svr4       standard
+       sysv       standard
+       tru64      like Tru64 (was Digital Unix, was OSF/1) ps
+       unix       standard
+       unix95     standard
+       unix98     standard
+
+SEE ALSO
+       pgrep(1), pstree(1), top(1), proc(5).
+
+STANDARDS
+       This ps conforms to:
+
+       1   Version 2 of the Single Unix Specification
+       2   The Open Group Technical Standard Base Specifications, Issue 6
+       3   IEEE Std 1003.1, 2004 Edition
+       4   X/Open System Interfaces Extension [UP XSI]
+       5   ISO/IEC 9945:2003
+
+AUTHOR
+       ps was originally written by Branko Lankester ⟨lankeste@fwi.uva.nl⟩.  Michael K. Johnson ⟨johnsonm@redhat.com⟩ re-wrote it significantly to use the proc filesystem, changing a few things in the process.  Michael Shields
+       ⟨mjshield@nyx.cs.du.edu⟩ added the pid-list feature.  Charles Blake ⟨cblake@bbn.com⟩ added multi-level sorting, the dirent-style library, the device name-to-number mmaped database, the approximate binary search directly on
+       System.map, and many code and documentation cleanups.  David Mossberger-Tang wrote the generic BFD support for psupdate.  Albert Cahalan ⟨albert@users.sf.net⟩ rewrote ps for full Unix98 and BSD support, along with some ugly
+       hacks for obsolete and foreign syntax.
+
+       Please send bug reports to ⟨procps@freelists.org⟩.  No subscription is required or suggested.
+
+
+
+procps-ng                                                                                                     December 2011                                                                                                         PS(1)

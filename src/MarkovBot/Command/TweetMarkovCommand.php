@@ -5,14 +5,8 @@
 
 namespace MarkovBot\Command;
 
-use MarkovBot\MarkovBot;
-use MarkovBot\Command\ContainerAwareCommand;
-use Symfony\Component\Console\Command\Command;
-use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
-use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
-use TTools\App;
 
 class TweetMarkovCommand extends ContainerAwareCommand
 {
@@ -38,13 +32,9 @@ class TweetMarkovCommand extends ContainerAwareCommand
         $markov = $this->get('markov');
         $result = $markov->generate();
 
-        $content = wordwrap($result, 140, '----');
-        $split = explode('----', $content);
-        $tweet = $split[0];
+        $output->writeln("<comment><info>Posting:</info> $result </comment>");
 
-        $output->writeln("<comment><info>Posting:</info> $tweet</comment>");
-
-        $twitter->update($tweet);
+        $twitter->update($result);
 
         return 1;
     }

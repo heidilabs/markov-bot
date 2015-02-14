@@ -6,6 +6,7 @@
 namespace MarkovBot\Service;
 
 use MarkovBot\Adaptor\AdaptorInterface;
+use MarkovPHP\MixedSourceChain;
 use MarkovPHP\WordChain;
 use Pimple\Container;
 use Pimple\ServiceProviderInterface;
@@ -21,13 +22,8 @@ class MarkovService implements ServiceProviderInterface
     public function registerAdaptors(array $adaptors)
     {
         foreach ($adaptors as $prefix => $adaptor) {
-            $this->registerAdaptor($prefix, new $adaptor);
+           $this->adaptors[$prefix] = $adaptor;
         }
-    }
-
-    public function registerAdaptor($prefix, AdaptorInterface $adaptor)
-    {
-        $this->adaptors[$prefix] = $adaptor;
     }
 
     public function register(Container $pimple)
@@ -59,25 +55,57 @@ class MarkovService implements ServiceProviderInterface
         return null;
     }
 
-    public function generate()
+    public function generate($limit = 140)
     {
         //read settings
-        $adaptor = $this->getAdaptor($this->settings['source']);
-        $adaptor->load($this->settings);
+        $sources = $this->settings['sources'];
 
-        return $this->generateWordChain(
-            $adaptor->getSample(),
-            $this->getChain(),
-            $this->getBlocks(),
-            $this->getTheme()
-        );
+        $result = "";
+
+        if ($this->settings['method'] == 'wordchain') {
+            $sample = $this->mergeSources($sources);
+            $result = $this->generateWordChain($sample);
+        } else {
+            $adaptor1 = $this->getAdaptor($sources[0]);
+            $adaptor2 = $this->getAdaptor($sources[1]);
+
+            $result = $this->generateCombinedChain($adaptor1->getSample(), $adaptor2->getSample());
+        }
+
+
+        $content = wordwrap($result, $limit, '----');
+        $split = explode('----', $content);
+        $result = $split[0];
+
+        return $result;
     }
 
-    public function generateWordChain($sample, $chain = 2, $blocks = 10, $theme = null)
+    public function mergeSources(array $sources = [])
     {
-        $markov = new WordChain($sample, $chain);
+        $sample = "";
 
-        return $markov->generate($blocks, $theme);
+        foreach ($sources as $source) {
+            $adaptor = $this->getAdaptor($source);
+            if ($adaptor) {
+                $sample .= ' ' . $adaptor->getSample();
+            }
+        }
+
+        return $sample;
+    }
+
+    public function generateWordChain($sample)
+    {
+        $markov = new WordChain($sample, $this->getChain());
+
+        return $markov->generate($this->getBlocks(), $this->getTheme());
+    }
+
+    public function generateCombinedChain($sample1, $sample2)
+    {
+        $markov = new MixedSourceChain($sample1, $sample2, $this->getBlocks()*2);
+
+        return $markov->generate();
     }
 
     /**
@@ -88,6 +116,15 @@ class MarkovService implements ServiceProviderInterface
     {
         $adaptor = explode('://', $source);
 
-        return isset($this->adaptors[$adaptor[0]]) ? $this->adaptors[$adaptor[0]] : null;
+        $adaptorClass = isset($this->adaptors[$adaptor[0]]) ? $this->adaptors[$adaptor[0]] : null;
+
+        if ($adaptorClass) {
+            $adaptor = new $adaptorClass();
+            $adaptor->load($source);
+
+            return $adaptor;
+        }
+
+        return null;
     }
 }

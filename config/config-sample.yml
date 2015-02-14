@@ -4,12 +4,16 @@ twitter:
     consumer_secret: API_SECRET
     access_token: ACCESS_TOKEN
     access_token_secret: ACCESS_TOKEN_SECRET
-    
+
 adaptors:
     file: MarkovBot\Adaptor\FileAdaptor
 
 markov.settings:
-    method: wordchain
-    source: file://data/nietzsche.txt
+    method: mixedsource
+    sources:
+        - file://data/nietzsche.txt
+        - file://data/mobydick.txt
     chain: 2
     blocks: 10
+    themes:
+        - love
