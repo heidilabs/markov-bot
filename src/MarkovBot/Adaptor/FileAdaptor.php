@@ -9,10 +9,27 @@ use MarkovBot\Adaptor\AdaptorInterface;
 
 class FileAdaptor implements AdaptorInterface
 {
-    protected $filename;
+    /** @var string */
+    protected $content;
 
-    public function __construct()
+    public function load(array $params = [])
     {
+        $source = explode('://', $params['source']);
+        $path = __DIR__ . '/../../../' . $source[1];
 
+        if (!is_file($path)) {
+            throw new \Exception('Resource not found.');
+        }
+
+        $this->content = file_get_contents($path);
     }
+
+    /**
+     * @return string
+     */
+    public function getSample()
+    {
+        return $this->content;
+    }
+
 }

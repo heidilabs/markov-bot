@@ -17,15 +17,7 @@ class ConfigService implements ServiceProviderInterface
     {
         $this->configFile = $configFile;
     }
-
-    /**
-     * Registers services on the given container.
-     *
-     * This method should only be used to configure services and parameters.
-     * It should not get services.
-     *
-     * @param Container $pimple An Container instance
-     */
+    
     public function register(Container $pimple)
     {
         $yaml = new Parser();

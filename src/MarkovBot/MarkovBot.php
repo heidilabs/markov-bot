@@ -11,36 +11,25 @@ use MarkovBot\Service\TwitterService;
 use Pimple\Container;
 use TTools\App;
 
-class MarkovBot
+class MarkovBot extends Container
 {
-    /** @var string  */
-    private $configFile;
-
-    /** @var Container */
-    private $container;
 
     public function __construct($configFile)
     {
-        $this->configFile = $configFile;
+        $this['config.file'] = $configFile;
     }
 
     public function init()
     {
-        $this->container = new Container();
-        $this->container->register(new ConfigService($this->configFile));
+        $this->register(new ConfigService($this['config.file']));
 
-        $this->container->register(new TwitterService());
-        $this->container->register(new MarkovService());
-    }
-
-    public function getContainer()
-    {
-        return $this->container;
+        $this->register(new TwitterService());
+        $this->register(new MarkovService());
     }
 
     public function get($service)
     {
-        return $this->container->offsetExists($service) ? $this->container[$service] : null;
+        return $this->offsetExists($service) ? $this[$service] : null;
     }
 
     public function boot()

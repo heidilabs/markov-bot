@@ -15,7 +15,7 @@ class TwitterService implements ServiceProviderInterface
 
     public function register(Container $pimple)
     {
-        $pimple['twitter'] = function () use ($pimple) {
+        $pimple['twitter'] = function ($pimple) {
             $config = $pimple['config']['twitter'];
 
             $ttools = new App($config);

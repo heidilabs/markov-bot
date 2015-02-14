@@ -14,18 +14,18 @@ use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use TTools\App;
 
-class ConnectCommand extends ContainerAwareCommand
+class TweetMarkovCommand extends ContainerAwareCommand
 {
     protected function configure()
     {
         $this
-            ->setName('twitter:test')
-            ->setDescription('Test current configuration for Twitter');
+            ->setName('twitter:tweet')
+            ->setDescription('Post an update on Twitter using current configuration');
     }
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $output->writeln("<info>Testing Twitter configuration...</info>");
+        $output->writeln("<info>Preparing Tweet...</info>");
         $twitter = $this->get('twitter');
         $credentials = $twitter->getCredentials();
 
@@ -33,7 +33,19 @@ class ConnectCommand extends ContainerAwareCommand
             $output->writeln("<error>An error ocurred: " . $credentials['raw_response'] . "</error>");
             return 0;
         }
+        $output->writeln("<info>Account in use: " . $credentials['screen_name'] ."</info>");
 
-        $output->writeln("<comment>Account in use: " . $credentials['screen_name'] ."</comment>");
+        $markov = $this->get('markov');
+        $result = $markov->generate();
+
+        $content = wordwrap($result, 140, '----');
+        $split = explode('----', $content);
+        $tweet = $split[0];
+
+        $output->writeln("<comment><info>Posting:</info> $tweet</comment>");
+
+        $twitter->update($tweet);
+
+        return 1;
     }
 }
