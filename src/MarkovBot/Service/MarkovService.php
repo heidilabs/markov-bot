@@ -73,7 +73,7 @@ class MarkovService implements ServiceProviderInterface
             $adaptor1 = $this->getAdaptor($sources[0]);
             $adaptor2 = $this->getAdaptor($sources[1]);
 
-            $result = $this->generateCombinedChain($adaptor1->getSample(), $adaptor2->getSample());
+            $result = $this->generateCombinedChain($adaptor1->getSample($sources[0]), $adaptor2->getSample($sources[1]));
         }
 
 
@@ -91,7 +91,7 @@ class MarkovService implements ServiceProviderInterface
         foreach ($sources as $source) {
             $adaptor = $this->getAdaptor($source);
             if ($adaptor) {
-                $sample .= ' ' . $adaptor->getSample();
+                $sample .= ' ' . $adaptor->getSample($source);
             }
         }
 
@@ -120,12 +120,6 @@ class MarkovService implements ServiceProviderInterface
     {
         $split = explode('://', $source);
 
-        $adaptor = isset($this->adaptors[$split[0]]) ? $this->adaptors[$split[0]] : null;
-
-        if ($adaptor instanceof AdaptorInterface) {
-            $adaptor->load($source);
-        }
-
-        return $adaptor;
+        return isset($this->adaptors[$split[0]]) ? $this->adaptors[$split[0]] : null;
     }
 }

@@ -41,7 +41,7 @@ class TwitterAdaptor extends DefaultAdaptor
             $usersample = $this->loadCache($user);
         }
 
-        $this->content = $usersample;
+        return $usersample;
     }
 
     public function loadCache($user)

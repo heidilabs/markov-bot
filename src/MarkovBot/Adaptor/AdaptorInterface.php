@@ -10,15 +10,10 @@ use MarkovBot\MarkovBot;
 interface AdaptorInterface
 {
     /**
-     * @param $source
-     * @return mixed
-     */
-    public function load($source);
-
-    /**
+     * @param string $source Source
      * @return string
      */
-    public function getSample();
+    public function getSample($source);
 
     /**
      * @param MarkovBot $app

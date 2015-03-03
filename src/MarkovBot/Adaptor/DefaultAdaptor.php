@@ -26,16 +26,15 @@ class DefaultAdaptor implements AdaptorInterface
             throw new \Exception('Resource not found.');
         }
 
-        $this->content = file_get_contents($path);
-
-        return $this;
+        return file_get_contents($path);
     }
 
     /**
+     * @param string $source
      * @return string
      */
-    public function getSample()
+    public function getSample($source)
     {
-        return $this->content;
+        return $this->load($source);
     }
 }
