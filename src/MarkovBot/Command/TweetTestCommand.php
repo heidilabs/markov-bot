@@ -19,7 +19,7 @@ class TweetTestCommand extends ContainerAwareCommand
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        /*$output->writeln("<info>Testing Twitter configuration...</info>");
+        $output->writeln("<info>Testing Twitter configuration...</info>");
         $twitter = $this->get('twitter');
         $credentials = $twitter->getCredentials();
 
@@ -29,7 +29,7 @@ class TweetTestCommand extends ContainerAwareCommand
         }
 
         $output->writeln("<comment>Account in use: " . $credentials['screen_name'] ."</comment>");
-        */
+
         $markov = $this->get('markov');
         $result = $markov->generate();
 

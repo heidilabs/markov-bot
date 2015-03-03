@@ -1,16 +1,21 @@
 <?php
 /**
- * TextFeed for Markov
+ * DefaultAdaptor - Loads content from files
  */
 
 namespace MarkovBot\Adaptor;
 
 use MarkovBot\Adaptor\AdaptorInterface;
+use MarkovBot\MarkovBot;
 
-class FileAdaptor implements AdaptorInterface
+class DefaultAdaptor implements AdaptorInterface
 {
     /** @var string */
     protected $content;
+
+    public function register(MarkovBot $app)
+    {
+    }
 
     public function load($source)
     {
@@ -33,5 +38,4 @@ class FileAdaptor implements AdaptorInterface
     {
         return $this->content;
     }
-
 }

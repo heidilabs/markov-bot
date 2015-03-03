@@ -19,16 +19,19 @@ class MarkovService implements ServiceProviderInterface
     const DEFAULT_CHAIN = 2;
     const DEFAULT_BLOCKS = 10;
 
-    public function registerAdaptors(array $adaptors)
+    public function registerAdaptors(array $adaptors, Container $app)
     {
-        foreach ($adaptors as $prefix => $adaptor) {
-           $this->adaptors[$prefix] = $adaptor;
+        foreach ($adaptors as $prefix => $adaptorClass) {
+            $adaptor = new $adaptorClass();
+            $adaptor->register($app);
+
+            $this->adaptors[$prefix] = $adaptor;
         }
     }
 
     public function register(Container $pimple)
     {
-        $this->registerAdaptors($pimple['config']['adaptors']);
+        $this->registerAdaptors($pimple['config']['adaptors'], $pimple);
         $this->settings = $pimple['config']['markov.settings'];
 
         $pimple['markov'] = $this;
@@ -64,6 +67,7 @@ class MarkovService implements ServiceProviderInterface
 
         if ($this->settings['method'] == 'wordchain') {
             $sample = $this->mergeSources($sources);
+
             $result = $this->generateWordChain($sample);
         } else {
             $adaptor1 = $this->getAdaptor($sources[0]);
@@ -114,17 +118,14 @@ class MarkovService implements ServiceProviderInterface
      */
     public function getAdaptor($source)
     {
-        $adaptor = explode('://', $source);
+        $split = explode('://', $source);
 
-        $adaptorClass = isset($this->adaptors[$adaptor[0]]) ? $this->adaptors[$adaptor[0]] : null;
+        $adaptor = isset($this->adaptors[$split[0]]) ? $this->adaptors[$split[0]] : null;
 
-        if ($adaptorClass) {
-            $adaptor = new $adaptorClass();
+        if ($adaptor instanceof AdaptorInterface) {
             $adaptor->load($source);
-
-            return $adaptor;
         }
 
-        return null;
+        return $adaptor;
     }
 }
