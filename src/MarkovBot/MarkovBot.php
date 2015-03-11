@@ -8,8 +8,8 @@ namespace MarkovBot;
 use MarkovBot\Service\ConfigService;
 use MarkovBot\Service\MarkovService;
 use MarkovBot\Service\TwitterService;
+use MarkovBot\Service\CacheService;
 use Pimple\Container;
-use TTools\App;
 
 class MarkovBot extends Container
 {
@@ -22,7 +22,7 @@ class MarkovBot extends Container
     public function init()
     {
         $this->register(new ConfigService($this['config.file']));
-
+        $this->register(new CacheService());
         $this->register(new TwitterService());
         $this->register(new MarkovService());
     }

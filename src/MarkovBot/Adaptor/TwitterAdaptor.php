@@ -5,7 +5,6 @@
 
 namespace MarkovBot\Adaptor;
 
-use MarkovBot\Adaptor\DefaultAdaptor;
 use MarkovBot\MarkovBot;
 use TTools\App;
 
@@ -32,41 +31,7 @@ class TwitterAdaptor extends DefaultAdaptor
         $source = explode('://', $source);
         $user = $source[1];
 
-        $usersample = '';
-
-        if (!$this->isCached($user)) {
-            $usersample = $this->fetchTimelineSample($user);
-            $this->cacheSample($user, $usersample);
-        } else {
-            $usersample = $this->loadCache($user);
-        }
-
-        return $usersample;
-    }
-
-    public function loadCache($user)
-    {
-        $path = __DIR__ . '/../../../cache/' . $user . '.txt';
-
-        if (!is_file($path)) {
-            throw new \Exception('Resource not found.');
-        }
-
-        return file_get_contents($path);
-    }
-
-    public function cacheSample($user, $sample)
-    {
-        $path = __DIR__ . '/../../../cache/' . $user . '.txt';
-
-        $fp = fopen($path, 'w+');
-        fwrite($fp, $sample);
-        fclose($fp);
-    }
-
-    public function isCached($user)
-    {
-        return is_file(__DIR__ . '/../../../cache/' . $user . '.txt');
+        return $this->fetchTimelineSample($user);
     }
 
     public function fetchTimelineSample($user)

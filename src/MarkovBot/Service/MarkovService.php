@@ -13,8 +13,14 @@ use Pimple\ServiceProviderInterface;
 
 class MarkovService implements ServiceProviderInterface
 {
+    /** @var  array $adaptors */
     protected $adaptors;
+
+    /** @var  array $settings */
     protected $settings;
+
+    /** @var  \MarkovBot\SampleCache $cache */
+    protected $cache;
 
     const DEFAULT_CHAIN = 2;
     const DEFAULT_BLOCKS = 10;
@@ -33,6 +39,7 @@ class MarkovService implements ServiceProviderInterface
     {
         $this->registerAdaptors($pimple['config']['adaptors'], $pimple);
         $this->settings = $pimple['config']['markov.settings'];
+        $this->cache = $pimple['cache'];
 
         $pimple['markov'] = $this;
     }
@@ -58,6 +65,36 @@ class MarkovService implements ServiceProviderInterface
         return null;
     }
 
+    public function updateSampleCache($source)
+    {
+        $this->cache->write($source, $this->fetchSample($source));
+    }
+
+    public function fetchSample($source)
+    {
+        $adaptor = $this->getAdaptor($source);
+
+        if ($adaptor instanceof AdaptorInterface) {
+            return $adaptor->getSample($source);
+        }
+
+        return null;
+    }
+
+    /**
+     * Fetchs cached version of sample
+     * @param $source
+     * @return string
+     */
+    public function getSample($source)
+    {
+        if (!$this->cache->isCached($source)) {
+            $this->updateSampleCache($source);
+        }
+
+        return $this->cache->loadCache($source);
+    }
+
     public function generate($limit = 140)
     {
         //read settings
@@ -67,15 +104,10 @@ class MarkovService implements ServiceProviderInterface
 
         if ($this->settings['method'] == 'wordchain') {
             $sample = $this->mergeSources($sources);
-
             $result = $this->generateWordChain($sample);
         } else {
-            $adaptor1 = $this->getAdaptor($sources[0]);
-            $adaptor2 = $this->getAdaptor($sources[1]);
-
-            $result = $this->generateCombinedChain($adaptor1->getSample($sources[0]), $adaptor2->getSample($sources[1]));
+            $result = $this->generateCombinedChain($this->getSample($sources[0]), $this->getSample($sources[1]));
         }
-
 
         $content = wordwrap($result, $limit, '----');
         $split = explode('----', $content);
@@ -89,10 +121,7 @@ class MarkovService implements ServiceProviderInterface
         $sample = "";
 
         foreach ($sources as $source) {
-            $adaptor = $this->getAdaptor($source);
-            if ($adaptor) {
-                $sample .= ' ' . $adaptor->getSample($source);
-            }
+            $sample .= ' ' . $this->getSample($source);
         }
 
         return $sample;
