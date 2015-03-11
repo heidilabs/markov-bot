@@ -25,6 +25,10 @@ class MarkovService implements ServiceProviderInterface
     const DEFAULT_CHAIN = 2;
     const DEFAULT_BLOCKS = 10;
 
+    /**
+     * @param AdaptorInterface[] $adaptors
+     * @param Container $app
+     */
     public function registerAdaptors(array $adaptors, Container $app)
     {
         foreach ($adaptors as $prefix => $adaptorClass) {
@@ -35,6 +39,9 @@ class MarkovService implements ServiceProviderInterface
         }
     }
 
+    /**
+     * @param Container $pimple
+     */
     public function register(Container $pimple)
     {
         $this->registerAdaptors($pimple['config']['adaptors'], $pimple);
@@ -44,16 +51,25 @@ class MarkovService implements ServiceProviderInterface
         $pimple['markov'] = $this;
     }
 
+    /**
+     * @return int
+     */
     public function getChain()
     {
         return isset($this->settings['chain']) ? $this->settings['chain'] : self::DEFAULT_CHAIN;
     }
 
+    /**
+     * @return int
+     */
     public function getBlocks()
     {
         return isset($this->settings['blocks']) ? $this->settings['blocks'] : self::DEFAULT_BLOCKS;
     }
 
+    /**
+     * @return string|null
+     */
     public function getTheme()
     {
         if (isset($this->settings['themes'])) {
@@ -65,11 +81,19 @@ class MarkovService implements ServiceProviderInterface
         return null;
     }
 
+    /**
+     * @param string $source
+     */
     public function updateSampleCache($source)
     {
         $this->cache->write($source, $this->fetchSample($source));
     }
 
+    /**
+     * Fetch updated contents
+     * @param string $source
+     * @return null|string
+     */
     public function fetchSample($source)
     {
         $adaptor = $this->getAdaptor($source);
@@ -82,7 +106,7 @@ class MarkovService implements ServiceProviderInterface
     }
 
     /**
-     * Fetchs cached version of sample
+     * Fetch cached version of sample
      * @param $source
      * @return string
      */
@@ -95,6 +119,10 @@ class MarkovService implements ServiceProviderInterface
         return $this->cache->loadCache($source);
     }
 
+    /**
+     * @param int $limit
+     * @return string
+     */
     public function generate($limit = 140)
     {
         //read settings
@@ -116,6 +144,10 @@ class MarkovService implements ServiceProviderInterface
         return $result;
     }
 
+    /**
+     * @param array $sources
+     * @return string
+     */
     public function mergeSources(array $sources = [])
     {
         $sample = "";
@@ -127,6 +159,10 @@ class MarkovService implements ServiceProviderInterface
         return $sample;
     }
 
+    /**
+     * @param $sample
+     * @return string
+     */
     public function generateWordChain($sample)
     {
         $markov = new WordChain($sample, $this->getChain());
@@ -134,6 +170,11 @@ class MarkovService implements ServiceProviderInterface
         return $markov->generate($this->getBlocks(), $this->getTheme());
     }
 
+    /**
+     * @param string $sample1
+     * @param string $sample2
+     * @return string
+     */
     public function generateCombinedChain($sample1, $sample2)
     {
         $markov = new MixedSourceChain($sample1, $sample2, $this->getBlocks()*2);

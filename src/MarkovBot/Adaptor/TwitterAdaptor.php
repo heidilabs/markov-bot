@@ -24,7 +24,7 @@ class TwitterAdaptor extends DefaultAdaptor
 
     /**
      * @param $source
-     * @return mixed
+     * @return string
      */
     public function load($source)
     {
@@ -34,6 +34,10 @@ class TwitterAdaptor extends DefaultAdaptor
         return $this->fetchTimelineSample($user);
     }
 
+    /**
+     * @param $user
+     * @return string
+     */
     public function fetchTimelineSample($user)
     {
         $twitter = $this->ttools;
@@ -57,18 +61,11 @@ class TwitterAdaptor extends DefaultAdaptor
             $tweets = $twitter->get('/statuses/user_timeline.json', $params);
 
             foreach ($tweets as $tweet) {
-                $sample .= ' ' . $this->extractSample($tweet['text']);
+                $sample .= ' ' . $this->sanitizeSample($tweet['text']);
                 $lastId = $tweet['id_str'];
             }
         }
 
         return $sample;
-    }
-
-    protected function extractSample($tweet)
-    {
-        $output = preg_replace('/\b(https?|ftp|file):\/\/[-A-Z0-9+&@#\/%?=~_|$!:,.;]*[A-Z0-9+&@#\/%=~_|$]/i', '', $tweet);
-        $output = str_replace('"', "", $output);
-        return $output;
     }
 }
