@@ -127,4 +127,17 @@ Using mixedsource with twitter and rss feed
             - rss://feeds.gawker.com/gizmodo/full
 ```
           
-> magician show at #phpbnl15 closing. By the way: I have missed, and it's all on BitStream.... The changing color of       
+> magician show at #phpbnl15 closing. By the way: I have missed, and it's all on BitStream.... The changing color of
+
+
+## Managing multiple bots
+
+You can run multiple bots within the same installation, for that you just need to create other config files and place them inside your "config" folder.
+Then, when calling the **markov** commands, you should provide the ``--config`` option, passing the name of the file as parameter. 
+
+Example:
+
+```bash
+    $ php console.php twitter:test --config=other.yml
+    $ php console.php twitter:tweet --config=other.yml
+```
