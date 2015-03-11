@@ -54,7 +54,7 @@ class DefaultAdaptor implements AdaptorInterface
     {
         $output = strip_tags(html_entity_decode($sample));
         $output = preg_replace('/\b(https?|ftp|file):\/\/[-A-Z0-9+&@#\/%?=~_|$!:,.;]*[A-Z0-9+&@#\/%=~_|$]/i', '', $output);
-        $output = str_replace('"', "", $output);
+        $output = str_replace(['"', '(', ')', '”', '“'], "", $output);
 
         return $output;
     }
