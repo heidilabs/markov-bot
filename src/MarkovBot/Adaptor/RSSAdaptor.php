@@ -21,7 +21,18 @@ class RSSAdaptor extends DefaultAdaptor
         $content = Feed::loadRss($url);
 
         foreach ($content->item as $item) {
-            $sample .= ' ' . $this->sanitizeSample($item->{'content:encoded'});
+            $content = $this->sanitizeSample($item->{'content:encoded'});
+
+            if (!$content) {
+                $content = $this->sanitizeSample($item->description);
+            }
+
+            if (!$content) {
+                $content = $this->sanitizeSample($item->title);
+            }
+
+            $content = str_replace(['Read More', 'read more', 'Read more'], '', $content);
+            $sample .= ' ' . $content;
         }
 
         return $sample;
