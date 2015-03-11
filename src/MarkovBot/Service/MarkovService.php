@@ -112,6 +112,10 @@ class MarkovService implements ServiceProviderInterface
      */
     public function getSample($source)
     {
+        if ($this->getAdaptorType($source) === 'file') {
+            return $this->fetchSample($source);
+        }
+
         if (!$this->cache->isCached($source)) {
             $this->updateSampleCache($source);
         }
@@ -191,5 +195,16 @@ class MarkovService implements ServiceProviderInterface
         $split = explode('://', $source);
 
         return isset($this->adaptors[$split[0]]) ? $this->adaptors[$split[0]] : null;
+    }
+
+    /**
+     * @param $source
+     * @return mixed
+     */
+    public function getAdaptorType($source)
+    {
+        $split = explode('://', $source);
+
+        return $split[0];
     }
 }

@@ -13,7 +13,7 @@ class TweetMarkovCommand extends ContainerAwareCommand
     protected function configure()
     {
         $this
-            ->setName('twitter:tweet')
+            ->setName('markov:tweet')
             ->setDescription('Post an update on Twitter using current configuration');
     }
 
