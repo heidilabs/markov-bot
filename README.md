@@ -6,9 +6,9 @@ using the Symfony console. You can run the commands manually or schedule your bo
 
 - php5-cli (cli only, no web server needed) and php5-curl
 - [Composer](https://getcomposer.org/)
-- Twitter APP, and proper credentials: two keys for the app, and two keys for the user account in which the tweets are going to be posted. 
-For detailed instructions, check [this tutorial](http://twilex.readthedocs.org/en/latest/app_creation.html). The user tokens can be obtained
-in the APP settings page.
+- Twitter APP, and proper credentials for the user account in which the tweets will be posted. The easiest thing to do is to create the app
+using the same account where the tweets will be posted, so you can get the user tokens right away in the app settings page.
+For detailed instructions, check [this tutorial](http://twilex.readthedocs.org/en/latest/app_creation.html).
 
 ## Quick Installation Instructions
 
