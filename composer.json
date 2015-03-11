@@ -1,4 +1,9 @@
 {
+    "name": "heidilabs/markov-bot",
+    "description": "A twitter bot using markov-php",
+    "keywords": ["markov", "twitter", "bot"],
+    "homepage": "https://github.com/heidilabs/markov-bot",
+    "license": "MIT",
     "authors": [
         {
             "name": "Erika Heidi",
