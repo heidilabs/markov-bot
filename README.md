@@ -4,7 +4,7 @@ using the Symfony console. You can run the commands manually or schedule your bo
 
 ## Requirements
 
-- PHP (cli only, no web server needed)
+- php5-cli (cli only, no web server needed) and php5-curl
 - [Composer](https://getcomposer.org/)
 - Twitter APP, and proper credentials: two keys for the app, and two keys for the user account in which the tweets are going to be posted. 
 For detailed instructions, check [this tutorial](http://twilex.readthedocs.org/en/latest/app_creation.html). The user tokens can be obtained
@@ -12,10 +12,9 @@ in the APP settings page.
 
 ## Quick Installation Instructions
 
-1. Clone this repository
-2. Go to the app directory and run `composer install` to install the project dependencies
-3. Create your config file by copying `config/config-sample.yml` to `config/config.yml`. Edit the file to set your options, including Twitter credentials.
-4. It's ready to use. Run `php console.php` to see the available commands. To test your current configuration without tweeting it, run `php console.php markov:test` .
+1. Run `composer create-project heidilabs/markov-bot myDirectory` to clone the app repository and install the dependencies
+2. Create your config file by copying `config/config-sample.yml` to `config/config.yml`. Edit the file to set your options, including Twitter credentials.
+3. It's ready to use. Run `php console.php` to see the available commands. To test your current configuration without tweeting it, run `php console.php markov:test` .
 
 ## Commands
 
