@@ -15,7 +15,7 @@
     },
 
     "require": {
-        "heidilabs/markov-php": "~0.2",
+        "heidilabs/markov-php": "~0.4",
         "ttools/ttools": "~2.1.0",
         "symfony/console": "~2.6.0",
         "pimple/pimple": "~3.0",

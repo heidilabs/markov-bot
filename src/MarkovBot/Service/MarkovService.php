@@ -141,9 +141,9 @@ class MarkovService implements ServiceProviderInterface
             $result = $this->generateCombinedChain($this->getSample($sources[0]), $this->getSample($sources[1]));
         }
 
-        $content = wordwrap($result, $limit, '----');
+        $content = wordwrap($result, $limit-1, '----');
         $split = explode('----', $content);
-        $result = $split[0];
+        $result = $split[0] . '.';
 
         return $result;
     }
